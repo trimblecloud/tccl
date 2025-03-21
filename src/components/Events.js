@@ -13,7 +13,7 @@ const Events = () => {
     { name: 'Football', date: '26 to 27-04-2025', time: '07:00-11:00' },
     { name: 'Build your Logo', date: '30-04-2025', time: '16:00-17:00' },
     { name: 'Cricket', date: '03 to 04-05-2025', time: '07:00-11:00' },
-    { name: 'Thug of war', date: '07-05-2025', time: '16:00-17:00' },
+    { name: 'Tug of war', date: '07-05-2025', time: '16:00-17:00' },
   ];
 
   const endedEvents = [

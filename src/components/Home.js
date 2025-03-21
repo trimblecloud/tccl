@@ -13,11 +13,12 @@ const Home = () => {
     { house: 2, houseName: "Sparta", points: 10, logo: spartaLogo },
     { house: 3, houseName: "Mission FunPossible", points: 50, logo: missionFunPossibleLogo },
   ];
-
-  const topPlayers = [
-    { name: 'Alice', house: 1, event: 'Badminton' },
-    { name: 'Bob', house: 2, event: 'Chess' },
-    { name: 'Charlie', house: 1, event: 'Table Tennis' },
+  // Sort leaderboard by points in descending order
+  const sortedLeaderBoard = leaderBoard.sort((a, b) => b.points - a.points);
+  const captains = [
+    { name: 'Sweatha S', house: 1, team_name: 'The Yellow Sparks' , logo: yellowSparksLogo },
+    { name: 'Harivarthini R', house: 2, team_name: 'Sparta' , logo: spartaLogo},
+    { name: 'Vishali Senniappan ', house: 3, team_name: 'Mission FunPossible', logo: missionFunPossibleLogo },
   ];
 
   return (
@@ -28,7 +29,7 @@ const Home = () => {
             Leaderboard
           </Typography>
           <List>
-            {leaderBoard.map((item) => (
+            {sortedLeaderBoard.map((item) => (
               <ListItem key={item.house}>
                 <Box display="flex" alignItems="center">
                   <Avatar src={item.logo} alt={`${item.houseName} Logo`} sx={{ width: 40, height: 40, borderRadius: '8px', marginRight: '16px' }} />
@@ -42,13 +43,16 @@ const Home = () => {
       <Grid item xs={12}>
         <Paper elevation={3} sx={{ padding: '20px' }}>
           <Typography variant="h5" gutterBottom>
-            Top Players (Recent Event)
+            Captains
           </Typography>
           <List>
-            {topPlayers.map((player, index) => (
+            {captains.map((player, index) => (
+              <Box display="flex" alignItems="center">
               <ListItem key={index}>
-                <ListItemText primary={player.name} secondary={`House ${player.house} - ${player.event}`} />
+              <Avatar src={player.logo} alt={`${player.house} Logo`} sx={{ width: 40, height: 40, borderRadius: '8px', marginRight: '16px' }} />
+                <ListItemText primary={player.name} secondary={`House ${player.house} - ${player.team_name}`} />
               </ListItem>
+               </Box>
             ))}
           </List>
         </Paper>

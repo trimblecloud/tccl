@@ -141,7 +141,7 @@ const Participants = () => {
   return (
     <Paper elevation={3} sx={{ padding: '20px' }}>
       <Typography variant="h5" gutterBottom>
-        Participants
+        House Members
       </Typography>
       <TableContainer>
         <Table>

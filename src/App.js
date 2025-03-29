@@ -6,6 +6,7 @@ import { Brightness4 as Brightness4Icon, Brightness7 as Brightness7Icon } from '
 import Home from './components/Home';
 import Events from './components/Events';
 import Participants from './components/Participants';
+import GuessGame from './components/GuessGame';
 import logo from './components/logo/trimble-cloud-championship-league-logo.png';
 
 function App() {
@@ -101,9 +102,25 @@ function App() {
             </Link>
             <Link
               to="/participants"
-              style={{ color: theme.palette.text.primary, textDecoration: 'none', fontFamily: theme.typography.fontFamily }}
+              style={{ 
+                color: theme.palette.text.primary, 
+                textDecoration: 'none', 
+                marginRight: '16px', 
+                fontFamily: theme.typography.fontFamily 
+              }}
             >
               House Members
+            </Link>
+            <Link
+              to="/guessgame"
+              style={{ 
+                color: theme.palette.text.primary, 
+                textDecoration: 'none', 
+                marginRight: '16px', 
+                fontFamily: theme.typography.fontFamily 
+              }}
+            >
+              Guess Game
             </Link>
             <IconButton onClick={toggleColorMode} color="inherit">
               {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
@@ -115,6 +132,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/events" element={<Events />} />
             <Route path="/participants" element={<Participants />} />
+            <Route path="/guessgame" element={<GuessGame />} />
           </Routes>
         </Container>
         <Box

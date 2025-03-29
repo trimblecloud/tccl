@@ -1,12 +1,13 @@
 // App.js
 import React, { useState, useMemo, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Container, Box, createTheme, ThemeProvider, Avatar, IconButton } from '@mui/material';
 import { Brightness4 as Brightness4Icon, Brightness7 as Brightness7Icon } from '@mui/icons-material';
 import Home from './components/Home';
 import Events from './components/Events';
 import Participants from './components/Participants';
 import GuessGame from './components/GuessGame';
+import Fixtures from './components/Fixtures';
 import logo from './components/logo/trimble-cloud-championship-league-logo.png';
 
 function App() {
@@ -62,7 +63,7 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Router basename="/tccl">
+      <Router>
         <AppBar position="static" sx={{ borderRadius: 0 }}>
           <Toolbar>
             <Box display="flex" alignItems="center" sx={{ flexGrow: 1 }}>
@@ -101,6 +102,17 @@ function App() {
               Events
             </Link>
             <Link
+              to="/fixtures"
+              style={{
+                color: theme.palette.text.primary,
+                textDecoration: 'none',
+                marginRight: '16px',
+                fontFamily: theme.typography.fontFamily,
+              }}
+            >
+              Fixtures
+            </Link>
+            <Link
               to="/participants"
               style={{ 
                 color: theme.palette.text.primary, 
@@ -131,6 +143,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/events" element={<Events />} />
+            <Route path="/fixtures" element={<Fixtures />} />
             <Route path="/participants" element={<Participants />} />
             <Route path="/guessgame" element={<GuessGame />} />
           </Routes>
@@ -145,9 +158,9 @@ function App() {
             textAlign: 'center',
           }}
         >
-          <Typography variant="body2">A Trimble Cloud Team Building Initiative</Typography>
-          <Typography variant="body2">© 2025 - Made using AI Assistant</Typography>
-          <Typography variant="body2">Tag us in House Chat if you would like to make this site better</Typography>
+          <Typography variant="body2">A Team Building Initiative</Typography>
+          <Typography variant="body2">Trimble Cloud © 2025</Typography>
+          {/* <Typography variant="body2">Tag us in House Chat if you would like to make this site better</Typography> */}
         </Box>
       </Router>
     </ThemeProvider>

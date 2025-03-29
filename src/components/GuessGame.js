@@ -1,11 +1,17 @@
 // components/GuessGame.js
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   Paper, Typography, Button, Box, Grid, Card,
   CardContent, CardMedia, Radio, RadioGroup,
   FormControlLabel, FormControl, Fade, Alert,
   Snackbar, Backdrop, CircularProgress
 } from '@mui/material';
+import { styled } from '@mui/material/styles';
+
+// Import house logos
+import yellowSparksLogo from './logo/yellow-sparks-logo.png';
+import spartaLogo from './logo/sparta-logo.png';
+import missionFunPossibleLogo from './logo/mission-fun-possible-logo.png';
 
 const GuessGame = () => {
   // Game states
@@ -21,6 +27,84 @@ const GuessGame = () => {
   const [gameMode, setGameMode] = useState('default'); // 'default' or 'all'
   // Add a new state to track question results
   const [roundResults, setRoundResults] = useState([]);
+
+  // House themes including border styles, backgrounds, and badge shapes
+  const houseThemes = {
+    1: { // Yellow Sparks
+      main: '#FFD700',
+      border: '5px solid #FFD700',
+      shadow: '0 0 15px 5px rgba(255, 215, 0, 0.3)',
+      gradient: 'linear-gradient(135deg, #FFC700 0%, #FFE700 50%, #FFC700 100%)',
+      badgeColor: '#FFD700',
+      badgeText: '#000',
+      logo: yellowSparksLogo
+    },
+    2: { // Sparta - Changed from red to white-gray-black theme
+      main: '#303030',
+      border: '5px solid #303030',
+      shadow: '0 0 15px 5px rgba(0, 0, 0, 0.3)',
+      gradient: 'linear-gradient(135deg, #303030 0%, #A0A0A0 50%, #303030 100%)',
+      badgeColor: '#C0C0C0',
+      badgeText: '#000',
+      logo: spartaLogo
+    },
+    3: { // Mission FunPossible
+      main: '#4B0082',
+      border: '5px solid #4B0082',
+      shadow: '0 0 15px 5px rgba(75, 0, 130, 0.3)',
+      gradient: 'linear-gradient(135deg, #4B0082 0%, #9370DB 50%, #4B0082 100%)',
+      badgeColor: '#4B0082',
+      badgeText: '#FFF',
+      logo: missionFunPossibleLogo
+    }
+  };
+
+  // Styled components for the photo display
+  const StyledPhotoFrame = styled(Box)(({ theme, houseId }) => ({
+    position: 'relative',
+    padding: '8px',
+    borderRadius: '12px',
+    background: houseThemes[houseId]?.gradient || houseThemes.default.gradient,
+    border: houseThemes[houseId]?.border || houseThemes.default.border,
+    boxShadow: houseThemes[houseId]?.shadow || houseThemes.default.shadow,
+    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+    aspectRatio: '1/1', // Make frame square
+    overflow: 'hidden', // Clip the image to the frame's bounds
+  
+    '& img': { // Style the image inside the frame
+      width: '100%',
+      height: '100%',
+      objectFit: 'cover', // Ensure the image fills the frame, cropping if needed
+      display: 'block', // Ensure no extra space due to inline image layout
+    },
+    '&:hover': {
+      transform: 'scale(1.02)',
+      boxShadow: '0 10px 20px rgba(0,0,0,0.2)',
+    },
+  }));
+
+  const HouseBadge = styled('div')(({ theme, houseId }) => ({
+    position: 'absolute',
+    bottom: '10px',
+    right: '10px',
+    width: '60px',
+    height: '60px',
+    borderRadius: '50%', // Already circular, but making it explicit
+    backgroundColor: 'white',
+    border: `3px solid ${houseThemes[houseId]?.main || '#CCC'}`,
+    boxShadow: '0 3px 5px rgba(0,0,0,0.2)',
+    zIndex: 10,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+    padding: '0', // Remove padding to maximize logo space
+  }));
+
+  // Helper function to get house badge content
+  const getHouseLogo = (houseId) => {
+    return houseThemes[parseInt(houseId)]?.logo || '';
+  };
 
   // Feedback messages
   const correctMessages = [
@@ -332,7 +416,7 @@ const GuessGame = () => {
     
     setShowResult(true);
 
-    // Automatically move to next question after 1 second
+    // Automatically move to next question after 3 second
     setTimeout(() => {
       if (currentRound < questions.length - 1) {
         setCurrentRound(prevRound => prevRound + 1);
@@ -341,7 +425,7 @@ const GuessGame = () => {
       } else {
         setIsGameEnded(true);
       }
-    }, 1000);
+    }, 3000);
   };
 
   // Handle skipping current question
@@ -415,7 +499,7 @@ const GuessGame = () => {
             Think you know your colleagues? Test your knowledge!
           </Typography>
           <Typography variant="body1" paragraph>
-            You will be shown an image of a participant and need to guess their name.
+            You will be shown an image of a colleague and need to guess their name.
             Select your game mode to begin!
           </Typography>
           
@@ -426,14 +510,15 @@ const GuessGame = () => {
               sx={{ mr: 2 }}
               onClick={() => setGameMode('default')}
             >
-              Quick Game (10 Questions)
+              Quick Game
             </Button>
             <Button
               variant={gameMode === 'all' ? "contained" : "outlined"}
               color="primary"
               onClick={() => setGameMode('all')}
             >
-              Full Game ({allParticipantsWithHouse.length} Questions)
+              Full Game 
+              {/* ({allParticipantsWithHouse.length} Questions) */}
             </Button>
           </Box>
 
@@ -467,23 +552,54 @@ const GuessGame = () => {
               </Typography>
             </Box>
             
-            {/* Replace LinearProgress with custom progress segments */}
             {renderProgressSegments()}
             
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
-                <Card sx={{ height: '100%' }}>
-                  <CardMedia
-                    component="img"
-                    height="300"
-                    image={currentQuestion.participant.imagePath}
-                    alt="Participant"
-                    sx={{ objectFit: 'contain', p: 2 }}
-                  />
+                <Card 
+                  sx={{ 
+                    height: '100%', 
+                    bgcolor: 'background.paper',
+                    boxShadow: 3,
+                    overflow: 'visible'
+                  }}
+                >
+                  <StyledPhotoFrame houseId={currentQuestion.participant.houseId}>
+                    <HouseBadge houseId={currentQuestion.participant.houseId}>
+                      <img src={getHouseLogo(currentQuestion.participant.houseId)} alt="House Logo" style={{ width: '100%', height: '100%' }} />
+                    </HouseBadge>
+                    <CardMedia
+                      component="img"
+                      height="300"
+                      image={currentQuestion.participant.imagePath}
+                      alt="Participant"
+                      sx={{ 
+                        objectFit: 'contain', 
+                        borderRadius: '8px',
+                        backgroundColor: 'rgba(255,255,255,0.9)'
+                      }}
+                    />
+                  </StyledPhotoFrame>
                   <CardContent>
-                    <Typography variant="body1" color="text.secondary" align="center">
-                      {`House: ${getHouseName(currentQuestion.participant.houseId)}`}
-                    </Typography>
+                    <Box
+                      sx={{
+                        position: 'relative',
+                        mt: 1,
+                        p: 1,
+                        borderRadius: '4px',
+                        border: `2px solid ${houseThemes[currentQuestion.participant.houseId]?.main || '#CCC'}`,
+                        backgroundColor: `${houseThemes[currentQuestion.participant.houseId]?.main || '#CCC'}22`,
+                        textAlign: 'center'
+                      }}
+                    >
+                      <Typography 
+                        variant="body1" 
+                        fontWeight="bold"
+                        color={houseThemes[currentQuestion.participant.houseId]?.badgeText === '#000' ? 'text.primary' : houseThemes[currentQuestion.participant.houseId]?.main}
+                      >
+                        {getHouseName(currentQuestion.participant.houseId)}
+                      </Typography>
+                    </Box>
                   </CardContent>
                 </Card>
               </Grid>
@@ -602,10 +718,11 @@ const GuessGame = () => {
       )}
       
       <Snackbar
-        open={showResult}
-        autoHideDuration={3000}
-        onClose={() => {}}
-      />
+  open={showResult}
+  autoHideDuration={3000}
+  onClose={() => {}}
+  message={isCorrect ? "Correct answer!" : "Incorrect answer"}
+/>
     </Paper>
   );
 };

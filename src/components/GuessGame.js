@@ -58,7 +58,7 @@ const GuessGame = () => {
     const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
-        await fetchHighScores(currentUser.uid);
+        await fetchHighScores(currentUser.displayName);
       }
     });
 
@@ -88,7 +88,7 @@ const GuessGame = () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       setUser(result.user);
-      await fetchHighScores(result.user.uid);
+      await fetchHighScores(result.user.displayName);
     } catch (error) {
       console.error("Error signing in with Google:", error);
     }

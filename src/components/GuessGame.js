@@ -529,7 +529,7 @@ const GuessGame = () => {
             onClick={initializeGame}
             disabled={isLoading}
           >
-            {isLoading ? 'Loading...' : 'Start Game'}
+            {isLoading ? 'Loading...' : 'Click to Start'}
           </Button>
         </Box>
       )}
@@ -721,7 +721,7 @@ const GuessGame = () => {
   open={showResult}
   autoHideDuration={3000}
   onClose={() => {}}
-  message={isCorrect ? "Correct answer!" : "Incorrect answer"}
+  message={isCorrect ? "Correct answer!" : "Incorrect answer!"}
 />
     </Paper>
   );

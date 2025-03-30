@@ -24,16 +24,61 @@ const Home = () => {
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
-        <Paper elevation={3} sx={{ padding: '20px' }}>
+        <Paper
+          elevation={3}
+          sx={{
+            padding: '20px',
+            background: 'linear-gradient(135deg, #FFEB3B 0%, #FF9800 100%)',
+            color: '#000',
+            borderRadius: '16px',
+            boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3)',
+          }}
+        >
           <Typography variant="h5" gutterBottom>
             Leaderboard
           </Typography>
           <List>
             {sortedLeaderBoard.map((item) => (
-              <ListItem key={item.house}>
+              <ListItem
+                key={item.house}
+                sx={{
+                  '&:hover': {
+                    transform: 'scale(1.05)',
+                    transition: 'transform 0.3s ease',
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  },
+                }}
+              >
                 <Box display="flex" alignItems="center">
-                  <Avatar src={item.logo} alt={`${item.houseName} Logo`} sx={{ width: 40, height: 40, borderRadius: '8px', marginRight: '16px' }} />
-                  <ListItemText primary={item.houseName} secondary={`Points: ${item.points}`} />
+                  <Avatar
+                    src={item.logo}
+                    alt={`${item.houseName} Logo`}
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: '8px',
+                      marginRight: '16px',
+                      boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.5)',
+                    }}
+                  />
+                  <ListItemText
+                    primary={item.houseName}
+                    secondary={
+                      <Box
+                        sx={{
+                          display: 'inline-block',
+                          padding: '4px 8px',
+                          backgroundColor: '#ffffff',
+                          color: '#000',
+                          borderRadius: '12px',
+                          fontWeight: 'bold',
+                          boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
+                        }}
+                      >
+                        Points: {item.points}
+                      </Box>
+                    }
+                  />
                 </Box>
               </ListItem>
             ))}
@@ -41,18 +86,49 @@ const Home = () => {
         </Paper>
       </Grid>
       <Grid item xs={12}>
-        <Paper elevation={3} sx={{ padding: '20px' }}>
+        <Paper
+          elevation={3}
+          sx={{
+            padding: '20px',
+            background: 'linear-gradient(135deg, #4A148C 0%, #7B1FA2 100%)',
+            color: '#FFF',
+            borderRadius: '16px',
+            boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3)',
+          }}
+        >
           <Typography variant="h5" gutterBottom>
             Captains
           </Typography>
           <List>
             {captains.map((player, index) => (
-              <Box display="flex" alignItems="center">
-              <ListItem key={index}>
-              <Avatar src={player.logo} alt={`${player.house} Logo`} sx={{ width: 40, height: 40, borderRadius: '8px', marginRight: '16px' }} />
-                <ListItemText primary={player.name} secondary={`House ${player.house} - ${player.team_name}`} />
+              <ListItem
+                key={index}
+                sx={{
+                  '&:hover': {
+                    transform: 'scale(1.05)',
+                    transition: 'transform 0.3s ease',
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  },
+                }}
+              >
+                <Box display="flex" alignItems="center">
+                  <Avatar
+                    src={player.logo}
+                    alt={`${player.house} Logo`}
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: '8px',
+                      marginRight: '16px',
+                      boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.5)',
+                    }}
+                  />
+                  <ListItemText
+                    primary={player.name}
+                    secondary={`House ${player.house} - ${player.team_name}`}
+                  />
+                </Box>
               </ListItem>
-               </Box>
             ))}
           </List>
         </Paper>

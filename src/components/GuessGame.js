@@ -1,12 +1,21 @@
 // components/GuessGame.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Paper, Typography, Button, Box, Grid, Card,
   CardContent, CardMedia, Radio, RadioGroup,
   FormControlLabel, FormControl, Fade, Alert,
-  Snackbar, Backdrop, CircularProgress
+  Snackbar, Backdrop, CircularProgress, Avatar, Chip,
+  List, ListItem, useMediaQuery, useTheme
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { signInWithPopup, signOut } from 'firebase/auth';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { auth, db, googleProvider } from '../firebase';
+import GoogleIcon from '@mui/icons-material/Google';
+import LogoutIcon from '@mui/icons-material/Logout';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 
 // Import house logos
 import yellowSparksLogo from './logo/yellow-sparks-logo.png';
@@ -14,6 +23,9 @@ import spartaLogo from './logo/sparta-logo.png';
 import missionFunPossibleLogo from './logo/mission-fun-possible-logo.png';
 
 const GuessGame = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   // Game states
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [isGameEnded, setIsGameEnded] = useState(false);
@@ -27,6 +39,95 @@ const GuessGame = () => {
   const [gameMode, setGameMode] = useState('default'); // 'default' or 'all'
   // Add a new state to track question results
   const [roundResults, setRoundResults] = useState([]);
+  // Add authentication states
+  const [user, setUser] = useState(null);
+  const [highScores, setHighScores] = useState({
+    default: 0,
+    all: 0
+  });
+  // State to store leaderboard data
+  const [leaderboard, setLeaderboard] = useState({
+    default: [],
+    all: []
+  });
+  // State to store timer ID for automatic advancement
+  const [currentTimer, setCurrentTimer] = useState(null);
+
+  // Check if user is logged in on component mount
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        await fetchHighScores(currentUser.uid);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Fetch high scores from Firebase
+  const fetchHighScores = async (userId) => {
+    try {
+      const docRef = doc(db, "highScores", userId);
+      const docSnap = await getDoc(docRef);
+      
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setHighScores({
+          default: data.default || 0,
+          all: data.all || 0
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching high scores:", error);
+    }
+  };
+
+  // Handle Google Sign In
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      setUser(result.user);
+      await fetchHighScores(result.user.uid);
+    } catch (error) {
+      console.error("Error signing in with Google:", error);
+    }
+  };
+
+  // Handle Sign Out
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+      setHighScores({ default: 0, all: 0 });
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
+  // Save high score to Firebase
+  const saveHighScore = async (currentScore) => {
+    if (!user) return;
+    
+    try {
+      const username = user.displayName || "Anonymous"; // Use display name or fallback to "Anonymous"
+      const userScoreRef = doc(db, "highScores", username);
+      const currentHighScore = highScores[gameMode] || 0;
+      
+      // Only update if current score is higher than previous high score
+      if (currentScore > currentHighScore) {
+        const updatedScores = {
+          ...highScores,
+          [gameMode]: currentScore
+        };
+        
+        await setDoc(userScoreRef, updatedScores, { merge: true });
+        setHighScores(updatedScores);
+      }
+    } catch (error) {
+      console.error("Error saving high score:", error);
+    }
+  };
 
   // House themes including border styles, backgrounds, and badge shapes
   const houseThemes = {
@@ -399,7 +500,7 @@ const GuessGame = () => {
     setSelectedAnswer(event.target.value);
   };
 
-  // Update the handleSubmitAnswer to handle different total questions
+  // Update the handleSubmitAnswer function to have different timeouts based on whether the answer is correct or incorrect
   const handleSubmitAnswer = () => {
     if (!selectedAnswer) return;
 
@@ -416,8 +517,11 @@ const GuessGame = () => {
     
     setShowResult(true);
 
-    // Automatically move to next question after 3 second
-    setTimeout(() => {
+    // Set different timeout durations based on whether the answer is correct or incorrect
+    const timeoutDuration = isAnswerCorrect ? 1000 : 3000; // 1 second for correct answers, 3 seconds for incorrect
+
+    // Set a timer for automatic advancement
+    const timer = setTimeout(() => {
       if (currentRound < questions.length - 1) {
         setCurrentRound(prevRound => prevRound + 1);
         setShowResult(false);
@@ -425,7 +529,10 @@ const GuessGame = () => {
       } else {
         setIsGameEnded(true);
       }
-    }, 3000);
+    }, timeoutDuration);
+
+    // Save the timer ID so it can be cleared if user manually advances
+    setCurrentTimer(timer);
   };
 
   // Handle skipping current question
@@ -484,15 +591,129 @@ const GuessGame = () => {
     );
   };
 
+  // When game ends, save the score to Firebase if user is logged in
+  useEffect(() => {
+    if (isGameEnded && user) {
+      saveHighScore(score);
+    }
+  }, [isGameEnded]);
+
   // Current question object
   const currentQuestion = questions[currentRound];
 
+  // Fetch leaderboard data from Firebase
+  const fetchLeaderboard = async () => {
+    try {
+      const defaultQuery = query(
+        collection(db, 'highScores'),
+        orderBy('default', 'desc'),
+        limit(5)
+      );
+      const allQuery = query(
+        collection(db, 'highScores'),
+        orderBy('all', 'desc'),
+        limit(5)
+      );
+
+      const [defaultSnapshot, allSnapshot] = await Promise.all([
+        getDocs(defaultQuery),
+        getDocs(allQuery)
+      ]);
+
+      const defaultLeaderboard = defaultSnapshot.docs.map(doc => ({
+        username: doc.id,
+        score: doc.data().default || 0
+      }));
+
+      const allLeaderboard = allSnapshot.docs.map(doc => ({
+        username: doc.id,
+        score: doc.data().all || 0
+      }));
+
+      setLeaderboard({
+        default: defaultLeaderboard,
+        all: allLeaderboard
+      });
+    } catch (error) {
+      console.error('Error fetching leaderboard:', error);
+    }
+  };
+
+  // Fetch leaderboard when the component mounts
+  useEffect(() => {
+    fetchLeaderboard();
+  }, []);
+
   return (
-    <Paper elevation={3} sx={{ padding: '20px', minHeight: '500px' }}>
+    <Paper elevation={3} sx={{ padding: '20px', minHeight: '500px', position: 'relative' }}>
       <Typography variant="h5" gutterBottom align="center">
         Guess Who? Challenge
       </Typography>
       
+      {/* Authentication UI - Displayed at the top right corner - Mobile optimized */}
+      <Box sx={{ 
+        position: { xs: 'relative', md: 'absolute' },
+        top: { md: '20px' }, 
+        right: { md: '20px' },
+        width: { xs: '100%', md: 'auto' },
+        display: 'flex',
+        justifyContent: { xs: 'center', md: 'flex-end' },
+        alignItems: 'center',
+        mb: { xs: 2, md: 0 },
+        mt: { xs: 1, md: 0 }
+      }}>
+        {user ? (
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center',
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: { xs: 1, sm: 0 }
+          }}>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center',
+              mr: { sm: 2 }
+            }}>
+              <Avatar 
+                src={user.photoURL} 
+                alt={user.displayName} 
+                sx={{ width: 32, height: 32, mr: 1 }} 
+              />
+              <Box sx={{ textAlign: { xs: 'center', sm: 'right' } }}>
+                <Typography variant="body2" fontWeight="bold">
+                  {user.displayName?.split(' ')[0]}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Signed in
+                </Typography>
+              </Box>
+            </Box>
+            <Button 
+              variant="outlined" 
+              size="small" 
+              color="inherit" 
+              onClick={handleSignOut}
+              startIcon={<LogoutIcon />}
+              sx={{ minWidth: { xs: '100%', sm: 'auto' } }}
+            >
+              Sign out
+            </Button>
+          </Box>
+        ) : (
+          <Button 
+            variant="outlined" 
+            color="primary" 
+            size="small" 
+            onClick={handleGoogleSignIn}
+            startIcon={<GoogleIcon />}
+            fullWidth={isMobile}
+          >
+            Sign in with Google
+          </Button>
+        )}
+      </Box>
+      
+      {/* Game start screen */}
       {!isGameStarted && !isGameEnded && (
         <Box sx={{ textAlign: 'center', py: 4 }}>
           <Typography variant="h6" gutterBottom>
@@ -503,6 +724,7 @@ const GuessGame = () => {
             Select your game mode to begin!
           </Typography>
           
+          {/* Game Mode Selection */}
           <Box sx={{ mb: 3 }}>
             <Button
               variant={gameMode === 'default' ? "contained" : "outlined"}
@@ -511,16 +733,44 @@ const GuessGame = () => {
               onClick={() => setGameMode('default')}
             >
               Quick Game
+              {user && highScores.default > 0 && (
+                <Chip 
+                  size="small" 
+                  icon={<EmojiEventsIcon fontSize="small" />}
+                  label={`Best: ${highScores.default}`} 
+                  color="secondary"
+                  variant="outlined"
+                  sx={{ ml: 1 }} 
+                />
+              )}
             </Button>
             <Button
               variant={gameMode === 'all' ? "contained" : "outlined"}
               color="primary"
               onClick={() => setGameMode('all')}
             >
-              Full Game 
-              {/* ({allParticipantsWithHouse.length} Questions) */}
+              Full Game
+              {user && highScores.all > 0 && (
+                <Chip 
+                  size="small" 
+                  icon={<EmojiEventsIcon fontSize="small" />}
+                  label={`Best: ${highScores.all}`} 
+                  color="secondary"
+                  variant="outlined"
+                  sx={{ ml: 1 }} 
+                />
+              )}
             </Button>
           </Box>
+
+          {/* Optional login prompt */}
+          {!user && (
+            <Alert severity="info" sx={{ mb: 3, maxWidth: '600px', mx: 'auto' }}>
+              <Typography variant="body2">
+                Sign in with Google to save your high scores! (Optional)
+              </Typography>
+            </Alert>
+          )}
 
           <Button 
             variant="contained" 
@@ -529,7 +779,7 @@ const GuessGame = () => {
             onClick={initializeGame}
             disabled={isLoading}
           >
-            {isLoading ? 'Loading...' : 'Click to Start'}
+            {isLoading ? 'Loading...' : 'Start Game'}
           </Button>
         </Box>
       )}
@@ -540,6 +790,7 @@ const GuessGame = () => {
         </Backdrop>
       )}
       
+      {/* Game in progress */}
       {isGameStarted && !isGameEnded && !isLoading && currentQuestion && (
         <Fade in={true}>
           <Box>
@@ -679,6 +930,7 @@ const GuessGame = () => {
         </Fade>
       )}
       
+      {/* Game end screen */}
       {isGameEnded && (
         <Box sx={{ textAlign: 'center', py: 4 }}>
           <Typography variant="h4" gutterBottom>
@@ -703,6 +955,30 @@ const GuessGame = () => {
             </Typography>
           )}
           
+          {/* New High Score notification */}
+          {user && score > highScores[gameMode] && (
+            <Alert severity="success" sx={{ mb: 3, maxWidth: '400px', mx: 'auto' }}>
+              <Typography variant="body2" fontWeight="bold">
+                New High Score! Previous best: {highScores[gameMode]}
+              </Typography>
+            </Alert>
+          )}
+          
+          {/* Prompt to sign in to save score */}
+          {!user && score > 0 && (
+            <Box sx={{ mb: 3 }}>
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={handleGoogleSignIn}
+                startIcon={<GoogleIcon />}
+                sx={{ mb: 2 }}
+              >
+                Sign in to Save Your Score
+              </Button>
+            </Box>
+          )}
+          
           <Button 
             variant="contained" 
             color="primary" 
@@ -711,18 +987,195 @@ const GuessGame = () => {
               setGameMode('default');
               handleRestartGame();
             }}
+            sx={{ mr: 2 }}
           >
             Play Again
+          </Button>
+          
+          <Button 
+            variant="outlined" 
+            color="primary" 
+            size="large"
+            component={Link}
+            to="/"
+          >
+            Back to Home
           </Button>
         </Box>
       )}
       
+      {/* Countdown Snackbar */}
       <Snackbar
-  open={showResult}
-  autoHideDuration={3000}
-  onClose={() => {}}
-  message={isCorrect ? "Correct answer!" : "Incorrect answer!"}
-/>
+        open={showResult}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        autoHideDuration={3000}
+        message={`${isCorrect ? "Correct! " : "Incorrect! "}Next question coming up...`}
+      />
+      
+      {/* Leaderboard Section with enhanced styling */}
+      {user && (
+        <Box sx={{ mt: 4 }}>
+          <Paper 
+            elevation={3} 
+            sx={{ 
+              padding: '20px',
+              background: 'linear-gradient(135deg, #4A148C 0%, #7B1FA2 100%)',
+              color: '#FFF',
+              borderRadius: '16px',
+              boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3)',
+              mb: 3
+            }}
+          >
+            <Typography variant="h5" gutterBottom>
+              Leaderboard
+            </Typography>
+            
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="h6" gutterBottom sx={{ 
+                display: 'inline-block',
+                borderBottom: '3px solid #FFCF50',
+                paddingBottom: '4px'
+              }}>
+                Quick Game (Top 5)
+              </Typography>
+              {leaderboard.default.length > 0 && leaderboard.default.filter(entry => entry.score > 0).length > 0 ? (
+                <List sx={{ width: '100%' }}>
+                  {leaderboard.default
+                    .filter(entry => entry.score > 0)
+                    .map((entry, index) => (
+                      <ListItem
+                        key={index}
+                        sx={{
+                          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                          borderRadius: '12px',
+                          mb: 1,
+                          '&:hover': {
+                            transform: 'scale(1.02)',
+                            transition: 'transform 0.3s ease',
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                          },
+                        }}
+                      >
+                        <Box display="flex" alignItems="center" width="100%" justifyContent="space-between">
+                          <Box display="flex" alignItems="center">
+                            <Avatar 
+                              sx={{ 
+                                bgcolor: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : 'grey.500',
+                                color: index < 3 ? 'black' : 'white',
+                                mr: 2,
+                                fontWeight: 'bold'
+                              }}
+                            >
+                              {index + 1}
+                            </Avatar>
+                            <Typography fontWeight="bold">
+                              {entry.username}
+                            </Typography>
+                          </Box>
+                          <Box
+                            sx={{
+                              display: 'inline-block',
+                              padding: '4px 12px',
+                              backgroundColor: '#FFCF50',
+                              color: '#000',
+                              borderRadius: '12px',
+                              fontWeight: 'bold',
+                              boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
+                            }}
+                          >
+                            {entry.score} pts
+                          </Box>
+                        </Box>
+                      </ListItem>
+                    ))}
+                </List>
+              ) : (
+                <Typography variant="body1" sx={{ 
+                  mt: 2, 
+                  textAlign: 'center',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: '8px',
+                  p: 2
+                }}>
+                  No scores available yet.
+                </Typography>
+              )}
+            </Box>
+
+            <Box>
+              <Typography variant="h6" gutterBottom sx={{ 
+                display: 'inline-block',
+                borderBottom: '3px solid #FFCF50',
+                paddingBottom: '4px'
+              }}>
+                Full Game (Top 5)
+              </Typography>
+              {leaderboard.all.length > 0 && leaderboard.all.filter(entry => entry.score > 0).length > 0 ? (
+                <List sx={{ width: '100%' }}>
+                  {leaderboard.all
+                    .filter(entry => entry.score > 0)
+                    .map((entry, index) => (
+                      <ListItem
+                        key={index}
+                        sx={{
+                          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                          borderRadius: '12px',
+                          mb: 1,
+                          '&:hover': {
+                            transform: 'scale(1.02)',
+                            transition: 'transform 0.3s ease',
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                          },
+                        }}
+                      >
+                        <Box display="flex" alignItems="center" width="100%" justifyContent="space-between">
+                          <Box display="flex" alignItems="center">
+                            <Avatar 
+                              sx={{ 
+                                bgcolor: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : 'grey.500',
+                                color: index < 3 ? 'black' : 'white',
+                                mr: 2,
+                                fontWeight: 'bold'
+                              }}
+                            >
+                              {index + 1}
+                            </Avatar>
+                            <Typography fontWeight="bold">
+                              {entry.username}
+                            </Typography>
+                          </Box>
+                          <Box
+                            sx={{
+                              display: 'inline-block',
+                              padding: '4px 12px',
+                              backgroundColor: '#FFCF50',
+                              color: '#000',
+                              borderRadius: '12px',
+                              fontWeight: 'bold',
+                              boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
+                            }}
+                          >
+                            {entry.score} pts
+                          </Box>
+                        </Box>
+                      </ListItem>
+                    ))}
+                </List>
+              ) : (
+                <Typography variant="body1" sx={{ 
+                  mt: 2, 
+                  textAlign: 'center',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: '8px',
+                  p: 2
+                }}>
+                  No scores available yet.
+                </Typography>
+              )}
+            </Box>
+          </Paper>
+        </Box>
+      )}
     </Paper>
   );
 };

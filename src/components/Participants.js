@@ -77,16 +77,22 @@ const MissionChip = styled(Chip)(({ theme }) => ({
 const HousePaper = styled(Paper)(({ houseId, theme }) => {
   const colors = {
     1: {
-      background: theme.palette.mode === 'light' ? 'linear-gradient(135deg, #FFEB3B 0%, #FF9800 100%)' : 'linear-gradient(135deg, #705500 0%, #703600 100%)',
-      color: theme.palette.mode === 'light' ? '#000000' : '#FFFFFF',
+      background: theme.palette.mode === 'light'
+        ? 'linear-gradient(135deg, #FFE082 0%, #FFB74D 100%)' // Lighter yellows/oranges
+        : 'linear-gradient(135deg, #664B00 0%, #663000 100%)', // Less intense dark yellows/oranges
+      color: theme.palette.mode === 'light' ? '#333333' : '#E0E0E0', // Slightly lighter text
     },
     2: {
-      background: theme.palette.mode === 'light' ? 'linear-gradient(135deg, #E53935 0%, #880E4F 100%)' : 'linear-gradient(135deg, #702020 0%, #3F0022 100%)',
-      color: '#FFFFFF',
+      background: theme.palette.mode === 'light'
+        ? 'linear-gradient(135deg, #EF9A9A 0%, #CE93D8 100%)' // Lighter reds/purples
+        : 'linear-gradient(135deg, #5C2A2A 0%, #4A148C 100%)', // Less intense dark reds/purples
+      color: '#F5F5F5', // Slightly lighter text
     },
     3: {
-      background: theme.palette.mode === 'light' ? 'linear-gradient(135deg, #4A148C 0%, #7B1FA2 100%)' : 'linear-gradient(135deg, #250544 0%, #3E0B51 100%)',
-      color: '#FFFFFF',
+      background: theme.palette.mode === 'light'
+        ? 'linear-gradient(135deg, #CE93D8 0%, #B39DDB 100%)' // Lighter purples
+        : 'linear-gradient(135deg, #3F2859 0%, #4A3066 100%)', // Less intense dark purples
+      color: '#F5F5F5', // Slightly lighter text
     },
   };
 

@@ -37,7 +37,9 @@ const StyledAccordionSummary = styled(AccordionSummary)(({ theme, isUpcoming }) 
 const StyledEventCard = styled(Card)(({ theme, isPast }) => ({
   height: '100%',
   borderRadius: '10px',
-  backgroundColor: isPast ? 'rgba(255, 255, 255, 0.1)' : 'rgba(167, 160, 160, 0.9)',
+  backgroundColor: isPast 
+    ? theme.palette.mode === 'light' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(30, 30, 30, 0.7)'
+    : theme.palette.mode === 'light' ? 'rgba(255, 255, 255, 0.9)' : 'rgba(50, 50, 50, 0.9)',
   transition: 'transform 0.3s ease, box-shadow 0.3s ease',
   display: 'flex',
   flexDirection: 'column',
@@ -127,6 +129,9 @@ const Events = () => {
   // Custom event card component
   const EventCard = ({ event }) => {
     const isPast = !event.dates.some(date => isUpcoming(date));
+    const cardTextColor = isPast 
+      ? theme.palette.mode === 'light' ? '#000000' : '#FFFFFF'
+      : theme.palette.mode === 'light' ? '#000000' : '#FFFFFF';
     
     return (
       <StyledEventCard isPast={isPast}>
@@ -145,12 +150,19 @@ const Events = () => {
             WebkitLineClamp: 3,
             WebkitBoxOrient: 'vertical',
             fontWeight: 'bold',
-            color: isPast ? theme.palette.text.primary : theme.palette.primary.primary
+            color: theme.palette.mode === 'light' 
+              ? isPast ? '#555' : theme.palette.primary.main 
+              : isPast ? '#CCC' : theme.palette.primary.light
           }}>
             {event.name}
           </Typography>
           
-          <Divider sx={{ mb: 2, backgroundColor: isPast ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.1)' }} />
+          <Divider sx={{ 
+            mb: 2, 
+            backgroundColor: isPast 
+              ? theme.palette.mode === 'light' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'
+              : theme.palette.mode === 'light' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'
+          }} />
           
           {/* Date Section */}
           <Box>
@@ -158,7 +170,9 @@ const Events = () => {
               sx={{ 
                 mb: 0.5, 
                 fontWeight: 'bold',
-                color: isPast ? 'rgba(255,255,255,0.7)' : 'text.primary'
+                color: theme.palette.mode === 'light'
+                  ? 'text.primary'
+                  : 'text.primary'
               }}
             >
               Date{event.dates.length > 1 ? 's' : ''}:
@@ -175,8 +189,12 @@ const Events = () => {
                   sx={{ 
                     mb: 1, 
                     fontWeight: 'medium',
-                    backgroundColor: isUpcoming(date) ? 'rgba(255, 207, 80, 0.9)' : 'rgba(255, 255, 255, 0.2)',
-                    color: isUpcoming(date) ? '#000' : '#fff',
+                    backgroundColor: isUpcoming(date) 
+                      ? 'rgba(255, 207, 80, 0.9)' 
+                      : theme.palette.mode === 'light' 
+                        ? 'rgba(180, 180, 180, 0.5)' 
+                        : 'rgba(80, 80, 80, 0.7)',
+                    color: isUpcoming(date) ? '#000' : theme.palette.mode === 'light' ? '#000' : '#fff',
                     '& .MuiChip-icon': {
                       color: 'inherit'
                     }
@@ -192,7 +210,9 @@ const Events = () => {
               sx={{ 
                 mb: 0.5, 
                 fontWeight: 'bold',
-                color: isPast ? 'rgba(255,255,255,0.7)' : 'text.primary'
+                color: theme.palette.mode === 'light'
+                  ? 'text.primary'
+                  : 'text.primary'
               }}
             >
               Time:
@@ -203,7 +223,9 @@ const Events = () => {
               size="medium"
               sx={{ 
                 fontWeight: 'medium',
-                backgroundColor: isPast ? 'rgba(123, 31, 162, 0.7)' : '#4a148c',
+                backgroundColor: isPast 
+                  ? theme.palette.mode === 'light' ? 'rgba(123, 31, 162, 0.7)' : 'rgba(123, 31, 162, 0.7)'
+                  : theme.palette.mode === 'light' ? '#4a148c' : '#7B1FA2',
                 color: 'white',
                 '& .MuiChip-icon': {
                   color: 'white'

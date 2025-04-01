@@ -98,6 +98,20 @@ const Fixtures = () => {
       icon: <SportsTennisIcon />,
       color: '#E91E63', // Pink
       description: 'Teams are divided into 6 groups. Each group has 3 teams. Top team from each group advances to Semifinal League.',
+      venue: '5th Floor TT Play Area',
+      timings: [
+        { 
+          date: '2nd April 2025 (Wednesday)', 
+          details: 'Group Stage for Groups A, B, and C',
+          specificTimings: [
+            { group: 'Group A', time: '4:00 PM sharp' },
+            { group: 'Group B', time: '4:30 PM sharp' },
+            { group: 'Group C', time: '5:15 PM sharp' }
+          ]
+        },
+        { date: '3rd April 2025 (Thursday)', details: 'Group Stage for Groups D, E, and F' },
+        { date: '4th April 2025 (Friday)', details: 'Semi-Final League and the Finals 🏆' },
+      ],
       fixtures: [
         {
           title: 'Group League',
@@ -188,6 +202,156 @@ const Fixtures = () => {
       <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
         {tournament.description}
       </Typography>
+
+      {/* Match Timings Section */}
+      {tournament.timings && tournament.timings.length > 0 && (
+        <Box sx={{ mb: 4 }}>
+          {/* Venue Section */}
+          {tournament.venue && (
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="h6" gutterBottom sx={{ 
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                color: theme.palette.mode === 'light' ? tournament.color : theme.palette.primary.light
+              }}>
+                🎯 Venue:
+              </Typography>
+              <Paper elevation={2} sx={{ 
+                p: 2, 
+                mb: 3,
+                borderRadius: '12px',
+                background: theme.palette.mode === 'light' 
+                  ? 'linear-gradient(145deg, #ffffff, #f5f5f5)' 
+                  : 'linear-gradient(145deg, #2d2d2d, #1a1a1a)',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+              }}>
+                <Typography 
+                  variant="body1" 
+                  fontWeight="bold"
+                  sx={{ 
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                  }}
+                >
+                  ✅ {tournament.venue}
+                </Typography>
+              </Paper>
+            </Box>
+          )}
+
+          <Typography variant="h6" gutterBottom sx={{ 
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            color: theme.palette.mode === 'light' ? tournament.color : theme.palette.primary.light
+          }}>
+            🚀 Match Timings:
+          </Typography>
+
+          <Paper elevation={2} sx={{ 
+            p: 2, 
+            mb: 3,
+            borderRadius: '12px',
+            background: theme.palette.mode === 'light' 
+              ? 'linear-gradient(145deg, #ffffff, #f5f5f5)' 
+              : 'linear-gradient(145deg, #2d2d2d, #1a1a1a)',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+          }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {tournament.timings.map((timing, idx) => (
+                <Box 
+                  key={idx} 
+                  sx={{ 
+                    display: 'flex',
+                    alignItems: { xs: 'flex-start', sm: 'center' },
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    gap: { xs: 1, sm: 2 },
+                    padding: 1,
+                    borderRadius: '8px',
+                    bgcolor: idx % 2 === 0 
+                      ? 'rgba(0, 0, 0, 0.03)' 
+                      : 'transparent',
+                    '&:hover': {
+                      bgcolor: 'rgba(0, 0, 0, 0.06)'
+                    }
+                  }}
+                >
+                  <Box 
+                    sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      minWidth: { xs: '100%', sm: '200px' }
+                    }}
+                  >
+                    <Typography 
+                      variant="body1" 
+                      fontWeight="bold"
+                      sx={{ 
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        color: theme.palette.mode === 'light' 
+                          ? tournament.color 
+                          : theme.palette.primary.light
+                      }}
+                    >
+                      ✅ {timing.date}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="body1" sx={{ mb: timing.specificTimings ? 1 : 0 }}>
+                      {timing.details}
+                    </Typography>
+                    
+                    {/* Specific timings for each group if available */}
+                    {timing.specificTimings && timing.specificTimings.length > 0 && (
+                      <Box sx={{ 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        gap: 1,
+                        ml: { xs: 0, sm: 2 },
+                        mt: 1,
+                        p: 1,
+                        borderLeft: '3px solid',
+                        borderColor: theme.palette.mode === 'light' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)',
+                        bgcolor: theme.palette.mode === 'light' ? 'rgba(0,0,0,0.02)' : 'rgba(255,255,255,0.03)',
+                        borderRadius: '0 8px 8px 0',
+                      }}>
+                        {timing.specificTimings.map((specificTiming, timeIdx) => (
+                          <Box 
+                            key={timeIdx}
+                            sx={{ 
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 2,
+                            }}
+                          >
+                            <Typography 
+                              variant="body2" 
+                              fontWeight="medium"
+                              sx={{ 
+                                minWidth: '80px',
+                                color: theme.palette.mode === 'light' ? tournament.color : theme.palette.primary.light,
+                              }}
+                            >
+                              ✅ {specificTiming.group}
+                            </Typography>
+                            <Typography variant="body2">
+                              → {specificTiming.time}
+                            </Typography>
+                          </Box>
+                        ))}
+                      </Box>
+                    )}
+                  </Box>
+                </Box>
+              ))}
+            </Box>
+          </Paper>
+        </Box>
+      )}
 
       {tournament.fixtures.map((fixture, idx) => (
         <Box key={idx} sx={{ mb: 4 }}>

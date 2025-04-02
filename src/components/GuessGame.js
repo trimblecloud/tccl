@@ -15,6 +15,7 @@ import { auth, db, googleProvider } from '../firebase';
 import GoogleIcon from '@mui/icons-material/Google';
 import LogoutIcon from '@mui/icons-material/Logout';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import TimerIcon from '@mui/icons-material/Timer';
 import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 
 // Import house logos
@@ -42,8 +43,8 @@ const GuessGame = () => {
   // Add authentication states
   const [user, setUser] = useState(null);
   const [highScores, setHighScores] = useState({
-    default: 0,
-    all: 0
+    default: { score: 0, time: 0 },
+    all: { score: 0, time: 0 }
   });
   // State to store leaderboard data
   const [leaderboard, setLeaderboard] = useState({
@@ -52,6 +53,10 @@ const GuessGame = () => {
   });
   // State to store timer ID for automatic advancement
   const [currentTimer, setCurrentTimer] = useState(null);
+  
+  // Timer states
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [timerInterval, setTimerInterval] = useState(null);
 
   // Check if user is logged in on component mount
   useEffect(() => {
@@ -74,13 +79,30 @@ const GuessGame = () => {
       if (docSnap.exists()) {
         const data = docSnap.data();
         setHighScores({
-          default: data.default || 0,
-          all: data.all || 0
+          default: {
+            score: data.default?.score || data.default || 0, // Handle old format
+            time: data.default?.time || 0
+          },
+          all: {
+            score: data.all?.score || data.all || 0, // Handle old format
+            time: data.all?.time || 0
+          }
         });
       }
     } catch (error) {
       console.error("Error fetching high scores:", error);
     }
+  };
+
+  // Format time function
+  const formatTime = (timeInSeconds) => {
+    if (timeInSeconds === undefined || timeInSeconds === null || 
+        timeInSeconds === Number.MAX_SAFE_INTEGER || timeInSeconds > 100000) {
+      return 'N/A'; // Handle missing or invalid time data
+    }
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = timeInSeconds % 60;
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
   // Handle Google Sign In
@@ -99,7 +121,7 @@ const GuessGame = () => {
     try {
       await signOut(auth);
       setUser(null);
-      setHighScores({ default: 0, all: 0 });
+      setHighScores({ default: { score: 0, time: 0 }, all: { score: 0, time: 0 } });
     } catch (error) {
       console.error("Error signing out:", error);
     }
@@ -112,17 +134,50 @@ const GuessGame = () => {
     try {
       const username = user.displayName || "Anonymous"; // Use display name or fallback to "Anonymous"
       const userScoreRef = doc(db, "highScores", username);
-      const currentHighScore = highScores[gameMode] || 0;
+      const docSnap = await getDoc(userScoreRef);
+      
+      // Get existing score data, handling old format
+      let currentHighScore = 0;
+      let currentBestTime = 0;
+      
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (typeof data[gameMode] === 'object') {
+          // New format with score and time
+          currentHighScore = data[gameMode]?.score || 0;
+          currentBestTime = data[gameMode]?.time || 0;
+        } else {
+          // Old format with just score
+          currentHighScore = data[gameMode] || 0;
+        }
+      }
       
       // Only update if current score is higher than previous high score
-      if (currentScore > currentHighScore) {
-        const updatedScores = {
-          ...highScores,
-          [gameMode]: currentScore
+      // or if the score is the same but time is better
+      if (currentScore > currentHighScore || 
+          (currentScore === currentHighScore && elapsedTime < currentBestTime)) {
+        
+        // Get all existing data to preserve other game mode scores
+        let updatedScores = {};
+        
+        if (docSnap.exists()) {
+          updatedScores = docSnap.data();
+        }
+        
+        // Update the current game mode with new format
+        updatedScores[gameMode] = {
+          score: currentScore,
+          time: elapsedTime
         };
         
         await setDoc(userScoreRef, updatedScores, { merge: true });
-        setHighScores(updatedScores);
+        setHighScores(prev => ({
+          ...prev,
+          [gameMode]: {
+            score: currentScore,
+            time: elapsedTime
+          }
+        }));
       }
     } catch (error) {
       console.error("Error saving high score:", error);
@@ -492,6 +547,15 @@ const GuessGame = () => {
     setSelectedAnswer('');
     setShowResult(false);
     setRoundResults([]); // Reset round results
+    
+    // Reset and start timer
+    setElapsedTime(0);
+    if (timerInterval) clearInterval(timerInterval);
+    const interval = setInterval(() => {
+      setElapsedTime(prev => prev + 1);
+    }, 1000);
+    setTimerInterval(interval);
+    
     setIsLoading(false);
   };
 
@@ -592,11 +656,30 @@ const GuessGame = () => {
   };
 
   // When game ends, save the score to Firebase if user is logged in
+  // and stop the timer
   useEffect(() => {
-    if (isGameEnded && user) {
-      saveHighScore(score);
+    if (isGameEnded) {
+      // Stop the timer
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        setTimerInterval(null);
+      }
+      
+      // Save score if logged in
+      if (user) {
+        saveHighScore(score);
+      }
     }
   }, [isGameEnded]);
+
+  // Cleanup timer when component unmounts
+  useEffect(() => {
+    return () => {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+      }
+    };
+  }, [timerInterval]);
 
   // Current question object
   const currentQuestion = questions[currentRound];
@@ -606,13 +689,11 @@ const GuessGame = () => {
     try {
       const defaultQuery = query(
         collection(db, 'highScores'),
-        orderBy('default', 'desc'),
-        limit(5)
+        limit(50) // Get more results for comprehensive sorting
       );
       const allQuery = query(
         collection(db, 'highScores'),
-        orderBy('all', 'desc'),
-        limit(5)
+        limit(50) // Get more results for comprehensive sorting
       );
 
       const [defaultSnapshot, allSnapshot] = await Promise.all([
@@ -620,15 +701,87 @@ const GuessGame = () => {
         getDocs(allQuery)
       ]);
 
-      const defaultLeaderboard = defaultSnapshot.docs.map(doc => ({
-        username: doc.id,
-        score: doc.data().default || 0
-      }));
+      // Process and sort default mode leaderboard
+      const defaultLeaderboard = defaultSnapshot.docs
+        .map(doc => {
+          const data = doc.data();
+          // Handle both old and new score formats
+          if (typeof data.default === 'object') {
+            // New format with score and time
+            return {
+              username: doc.id,
+              score: data.default?.score || 0,
+              time: data.default?.time || Number.MAX_SAFE_INTEGER // Use MAX_SAFE_INTEGER for sorting
+            };
+          } else {
+            // Old format with just score (no time)
+            return {
+              username: doc.id,
+              score: data.default || 0,
+              time: Number.MAX_SAFE_INTEGER, // Use MAX_SAFE_INTEGER for sorting
+              legacyFormat: true // Flag to indicate legacy format
+            };
+          }
+        })
+        .filter(entry => entry.score > 0) // Filter out zero scores
+        .sort((a, b) => {
+          // Sort by score (highest first)
+          if (b.score !== a.score) return b.score - a.score;
+          
+          // For entries with same score:
+          // If both have time data, sort by time (lowest first)
+          if (!a.legacyFormat && !b.legacyFormat) {
+            return a.time - b.time;
+          }
+          // If only one has time data, prioritize the one with time data
+          if (!a.legacyFormat && b.legacyFormat) return -1;
+          if (a.legacyFormat && !b.legacyFormat) return 1;
+          
+          // If both are legacy format, maintain original order
+          return 0;
+        })
+        .slice(0, 5); // Take top 5 after sorting
 
-      const allLeaderboard = allSnapshot.docs.map(doc => ({
-        username: doc.id,
-        score: doc.data().all || 0
-      }));
+      // Process and sort all mode leaderboard (same logic as above)
+      const allLeaderboard = allSnapshot.docs
+        .map(doc => {
+          const data = doc.data();
+          // Handle both old and new score formats
+          if (typeof data.all === 'object') {
+            // New format with score and time
+            return {
+              username: doc.id,
+              score: data.all?.score || 0,
+              time: data.all?.time || Number.MAX_SAFE_INTEGER
+            };
+          } else {
+            // Old format with just score (no time)
+            return {
+              username: doc.id,
+              score: data.all || 0,
+              time: Number.MAX_SAFE_INTEGER,
+              legacyFormat: true
+            };
+          }
+        })
+        .filter(entry => entry.score > 0) // Filter out zero scores
+        .sort((a, b) => {
+          // Sort by score (highest first)
+          if (b.score !== a.score) return b.score - a.score;
+          
+          // For entries with same score:
+          // If both have time data, sort by time (lowest first)
+          if (!a.legacyFormat && !b.legacyFormat) {
+            return a.time - b.time;
+          }
+          // If only one has time data, prioritize the one with time data
+          if (!a.legacyFormat && b.legacyFormat) return -1;
+          if (a.legacyFormat && !b.legacyFormat) return 1;
+          
+          // If both are legacy format, maintain original order
+          return 0;
+        })
+        .slice(0, 5); // Take top 5 after sorting
 
       setLeaderboard({
         default: defaultLeaderboard,
@@ -648,13 +801,11 @@ const GuessGame = () => {
     <Paper elevation={3} sx={{ padding: '20px', minHeight: '500px', position: 'relative' }}>
       <Typography variant="h5" gutterBottom align="center">
         Guess Who? Challenge
-      </Typography>
-      
-      {/* Authentication UI - Displayed at the top right corner - Mobile optimized */}
-      <Box sx={{ 
-        position: { xs: 'relative', md: 'absolute' },
-        top: { md: '20px' }, 
-        right: { md: '20px' },
+      </Typography>            {/* Authentication UI - Displayed at the top right corner - Mobile optimized */}
+      <Box sx={{
+         position: { xs: 'relative', md: 'absolute' },
+        top: { md: '20px' },
+         right: { md: '20px' },
         width: { xs: '100%', md: 'auto' },
         display: 'flex',
         justifyContent: { xs: 'center', md: 'flex-end' },
@@ -663,22 +814,22 @@ const GuessGame = () => {
         mt: { xs: 1, md: 0 }
       }}>
         {user ? (
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center',
+          <Box sx={{
+             display: 'flex',
+             alignItems: 'center',
             flexDirection: { xs: 'column', sm: 'row' },
             gap: { xs: 1, sm: 0 }
           }}>
-            <Box sx={{ 
-              display: 'flex', 
-              alignItems: 'center',
+            <Box sx={{
+               display: 'flex',
+               alignItems: 'center',
               mr: { sm: 2 }
             }}>
-              <Avatar 
-                src={user.photoURL} 
-                alt={user.displayName} 
-                sx={{ width: 32, height: 32, mr: 1 }} 
-              />
+              <Avatar
+                 src={user.photoURL}
+                 alt={user.displayName}
+                 sx={{ width: 32, height: 32, mr: 1 }}
+               />
               <Box sx={{ textAlign: { xs: 'center', sm: 'right' } }}>
                 <Typography variant="body2" fontWeight="bold">
                   {user.displayName?.split(' ')[0]}
@@ -688,11 +839,11 @@ const GuessGame = () => {
                 </Typography>
               </Box>
             </Box>
-            <Button 
-              variant="outlined" 
-              size="small" 
-              color="inherit" 
-              onClick={handleSignOut}
+            <Button
+               variant="outlined"
+               size="small"
+               color="inherit"
+               onClick={handleSignOut}
               startIcon={<LogoutIcon />}
               sx={{ minWidth: { xs: '100%', sm: 'auto' } }}
             >
@@ -700,20 +851,18 @@ const GuessGame = () => {
             </Button>
           </Box>
         ) : (
-          <Button 
-            variant="outlined" 
-            color="primary" 
-            size="small" 
-            onClick={handleGoogleSignIn}
+          <Button
+             variant="outlined"
+             color="primary"
+             size="small"
+             onClick={handleGoogleSignIn}
             startIcon={<GoogleIcon />}
             fullWidth={isMobile}
           >
             Sign in with Google
           </Button>
         )}
-      </Box>
-      
-      {/* Game start screen */}
+      </Box>            {/* Game start screen */}
       {!isGameStarted && !isGameEnded && (
         <Box sx={{ textAlign: 'center', py: 4 }}>
           <Typography variant="h6" gutterBottom>
@@ -722,9 +871,7 @@ const GuessGame = () => {
           <Typography variant="body1" paragraph>
             You will be shown an image of a colleague and need to guess their name.
             Select your game mode to begin!
-          </Typography>
-          
-          {/* Game Mode Selection */}
+          </Typography>                    {/* Game Mode Selection */}
           <Box sx={{ mb: 3 }}>
             <Button
               variant={gameMode === 'default' ? "contained" : "outlined"}
@@ -733,15 +880,15 @@ const GuessGame = () => {
               onClick={() => setGameMode('default')}
             >
               Quick Game
-              {user && highScores.default > 0 && (
-                <Chip 
-                  size="small" 
-                  icon={<EmojiEventsIcon fontSize="small" />}
-                  label={`Best: ${highScores.default}`} 
-                  color="secondary"
+              {user && highScores.default.score > 0 && (
+                <Chip
+                   size="small"
+                   icon={<EmojiEventsIcon fontSize="small" />}
+                  label={`Best: ${highScores.default.score} (${formatTime(highScores.default.time)})`}
+                   color="secondary"
                   variant="outlined"
-                  sx={{ ml: 1 }} 
-                />
+                  sx={{ ml: 1 }}
+                 />
               )}
             </Button>
             <Button
@@ -750,19 +897,18 @@ const GuessGame = () => {
               onClick={() => setGameMode('all')}
             >
               Full Game
-              {user && highScores.all > 0 && (
-                <Chip 
-                  size="small" 
-                  icon={<EmojiEventsIcon fontSize="small" />}
-                  label={`Best: ${highScores.all}`} 
-                  color="secondary"
+              {user && highScores.all.score > 0 && (
+                <Chip
+                   size="small"
+                   icon={<EmojiEventsIcon fontSize="small" />}
+                  label={`Best: ${highScores.all.score} (${formatTime(highScores.all.time)})`}
+                   color="secondary"
                   variant="outlined"
-                  sx={{ ml: 1 }} 
-                />
+                  sx={{ ml: 1 }}
+                 />
               )}
             </Button>
           </Box>
-
           {/* Optional login prompt */}
           {!user && (
             <Alert severity="info" sx={{ mb: 3, maxWidth: '600px', mx: 'auto' }}>
@@ -771,46 +917,45 @@ const GuessGame = () => {
               </Typography>
             </Alert>
           )}
-
-          <Button 
-            variant="contained" 
-            color="primary" 
-            size="large"
+          <Button
+             variant="contained"
+             color="primary"
+             size="large"
             onClick={initializeGame}
             disabled={isLoading}
           >
             {isLoading ? 'Loading...' : 'Start Game'}
           </Button>
         </Box>
-      )}
-      
-      {isLoading && (
+      )}            {isLoading && (
         <Backdrop open={true} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
           <CircularProgress color="inherit" />
         </Backdrop>
-      )}
-      
-      {/* Game in progress */}
+      )}            {/* Game in progress */}
       {isGameStarted && !isGameEnded && !isLoading && currentQuestion && (
         <Fade in={true}>
           <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2, alignItems: 'center' }}>
               <Typography variant="h6">
                 Round {currentRound + 1}/{questions.length}
               </Typography>
-              <Typography variant="h6">
-                Score: {score}
-              </Typography>
-            </Box>
-            
-            {renderProgressSegments()}
-            
-            <Grid container spacing={3}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Chip
+                   icon={<TimerIcon />}
+                   label={formatTime(elapsedTime)}
+                   color="primary"
+                  variant="outlined"
+                />
+                <Typography variant="h6">
+                  Score: {score}
+                </Typography>
+              </Box>
+            </Box>                        {renderProgressSegments()}                        <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
-                <Card 
-                  sx={{ 
-                    height: '100%', 
-                    bgcolor: 'background.paper',
+                <Card
+                   sx={{
+                     height: '100%',
+                     bgcolor: 'background.paper',
                     boxShadow: 3,
                     overflow: 'visible'
                   }}
@@ -824,9 +969,9 @@ const GuessGame = () => {
                       height="300"
                       image={currentQuestion.participant.imagePath}
                       alt="Participant"
-                      sx={{ 
-                        objectFit: 'contain', 
-                        borderRadius: '8px',
+                      sx={{
+                         objectFit: 'contain',
+                         borderRadius: '8px',
                         backgroundColor: 'rgba(255,255,255,0.9)'
                       }}
                     />
@@ -843,9 +988,9 @@ const GuessGame = () => {
                         textAlign: 'center'
                       }}
                     >
-                      <Typography 
-                        variant="body1" 
-                        fontWeight="bold"
+                      <Typography
+                         variant="body1"
+                         fontWeight="bold"
                         color={houseThemes[currentQuestion.participant.houseId]?.badgeText === '#000' ? 'text.primary' : houseThemes[currentQuestion.participant.houseId]?.main}
                       >
                         {getHouseName(currentQuestion.participant.houseId)}
@@ -853,14 +998,10 @@ const GuessGame = () => {
                     </Box>
                   </CardContent>
                 </Card>
-              </Grid>
-              
-              <Grid item xs={12} md={6}>
+              </Grid>                            <Grid item xs={12} md={6}>
                 <Typography variant="h6" gutterBottom>
                   Who is this?
-                </Typography>
-                
-                <FormControl component="fieldset" fullWidth disabled={showResult}>
+                </Typography>                                <FormControl component="fieldset" fullWidth disabled={showResult}>
                   <RadioGroup
                     value={selectedAnswer}
                     onChange={handleAnswerChange}
@@ -875,12 +1016,10 @@ const GuessGame = () => {
                       />
                     ))}
                   </RadioGroup>
-                </FormControl>
-                
-                {showResult ? (
+                </FormControl>                                {showResult ? (
                   <Box sx={{ mt: 3 }}>
-                    <Alert 
-                      severity={isCorrect ? "success" : "error"}
+                    <Alert
+                       severity={isCorrect ? "success" : "error"}
                       sx={{ mb: 2 }}
                     >
                       {getRandomFeedbackMessage(isCorrect)}
@@ -891,10 +1030,10 @@ const GuessGame = () => {
                       )}
                     </Alert>
                     {currentRound === questions.length - 1 && (
-                      <Button 
-                        variant="contained" 
-                        color="primary" 
-                        onClick={() => setIsGameEnded(true)}
+                      <Button
+                         variant="contained"
+                         color="primary"
+                         onClick={() => setIsGameEnded(true)}
                         fullWidth
                       >
                         See Results
@@ -903,10 +1042,10 @@ const GuessGame = () => {
                   </Box>
                 ) : (
                   <Box>
-                    <Button 
-                      variant="contained" 
-                      color="primary" 
-                      onClick={handleSubmitAnswer}
+                    <Button
+                       variant="contained"
+                       color="primary"
+                       onClick={handleSubmitAnswer}
                       disabled={!selectedAnswer}
                       fullWidth
                       sx={{ mt: 3, mb: 1 }}
@@ -928,20 +1067,13 @@ const GuessGame = () => {
             </Grid>
           </Box>
         </Fade>
-      )}
-      
-      {/* Game end screen */}
+      )}            {/* Game end screen */}
       {isGameEnded && (
         <Box sx={{ textAlign: 'center', py: 4 }}>
           <Typography variant="h4" gutterBottom>
             Game Complete!
-          </Typography>
-          
-          <Typography variant="h5" color={score >= questions.length * 0.7 ? "success.main" : score >= questions.length * 0.4 ? "info.main" : "error.main"} sx={{ mb: 3 }}>
-            Your Score: {score} out of {questions.length}
-          </Typography>
-          
-          {score >= questions.length * 0.7 ? (
+          </Typography>                    <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, mb: 3, flexWrap: 'wrap' }}>
+            <Typography variant="h5" color={score >= questions.length * 0.7 ? "success.main" : score >= questions.length * 0.4 ? "info.main" : "error.main"}>              Score: {score} out of {questions.length}            </Typography>                        <Typography variant="h5" color="primary">              Time: {formatTime(elapsedTime)}            </Typography>          </Box>                    {score >= questions.length * 0.7 ? (
             <Typography variant="body1" paragraph>
               Impressive! You really know your colleagues well!
             </Typography>
@@ -953,18 +1085,17 @@ const GuessGame = () => {
             <Typography variant="body1" paragraph>
               Don't worry! This game will help you get to know everyone better!
             </Typography>
-          )}
-          
-          {/* New High Score notification */}
-          {user && score > highScores[gameMode] && (
-            <Alert severity="success" sx={{ mb: 3, maxWidth: '400px', mx: 'auto' }}>
-              <Typography variant="body2" fontWeight="bold">
-                New High Score! Previous best: {highScores[gameMode]}
-              </Typography>
-            </Alert>
-          )}
-          
-          {/* Prompt to sign in to save score */}
+          )}                    {/* New High Score notification */}
+          {user && (
+            (score > highScores[gameMode].score ||
+             (score === highScores[gameMode].score && elapsedTime < highScores[gameMode].time)) && (
+              <Alert severity="success" sx={{ mb: 3, maxWidth: '400px', mx: 'auto' }}>
+                <Typography variant="body2" fontWeight="bold">
+                  New High Score! Previous best: {highScores[gameMode].score} points in {formatTime(highScores[gameMode].time)}
+                </Typography>
+              </Alert>
+            )
+          )}                    {/* Prompt to sign in to save score */}
           {!user && score > 0 && (
             <Box sx={{ mb: 3 }}>
               <Button
@@ -977,12 +1108,10 @@ const GuessGame = () => {
                 Sign in to Save Your Score
               </Button>
             </Box>
-          )}
-          
-          <Button 
-            variant="contained" 
-            color="primary" 
-            size="large"
+          )}                    <Button
+             variant="contained"
+             color="primary"
+             size="large"
             onClick={() => {
               setGameMode('default');
               handleRestartGame();
@@ -990,35 +1119,29 @@ const GuessGame = () => {
             sx={{ mr: 2 }}
           >
             Play Again
-          </Button>
-          
-          <Button 
-            variant="outlined" 
-            color="primary" 
-            size="large"
+          </Button>                    <Button
+             variant="outlined"
+             color="primary"
+             size="large"
             component={Link}
             to="/"
           >
             Back to Home
           </Button>
         </Box>
-      )}
-      
-      {/* Countdown Snackbar */}
+      )}            {/* Countdown Snackbar */}
       <Snackbar
         open={showResult}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         autoHideDuration={3000}
         message={`${isCorrect ? "Correct! " : "Incorrect! "}Next question coming up...`}
-      />
-      
-      {/* Leaderboard Section with enhanced styling */}
+      />            {/* Leaderboard Section with enhanced styling */}
       {user && (
         <Box sx={{ mt: 4 }}>
-          <Paper 
-            elevation={3} 
-            sx={{ 
-              padding: '20px',
+          <Paper
+             elevation={3}
+             sx={{
+               padding: '20px',
               background: 'linear-gradient(135deg, #4A148C 0%, #7B1FA2 100%)',
               color: '#FFF',
               borderRadius: '16px',
@@ -1028,50 +1151,57 @@ const GuessGame = () => {
           >
             <Typography variant="h5" gutterBottom>
               Leaderboard
-            </Typography>
-            
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" gutterBottom sx={{ 
-                display: 'inline-block',
+            </Typography>                        <Box sx={{ mb: 3 }}>
+              <Typography variant="h6" gutterBottom sx={{
+                 display: 'inline-block',
                 borderBottom: '3px solid #FFCF50',
                 paddingBottom: '4px'
               }}>
                 Quick Game (Top 5)
               </Typography>
-              {leaderboard.default.length > 0 && leaderboard.default.filter(entry => entry.score > 0).length > 0 ? (
+              {leaderboard.default.length > 0 ? (
                 <List sx={{ width: '100%' }}>
-                  {leaderboard.default
-                    .filter(entry => entry.score > 0)
-                    .map((entry, index) => (
-                      <ListItem
-                        key={index}
-                        sx={{
-                          backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                          borderRadius: '12px',
-                          mb: 1,
-                          '&:hover': {
-                            transform: 'scale(1.02)',
-                            transition: 'transform 0.3s ease',
-                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                          },
-                        }}
-                      >
-                        <Box display="flex" alignItems="center" width="100%" justifyContent="space-between">
-                          <Box display="flex" alignItems="center">
-                            <Avatar 
-                              sx={{ 
-                                bgcolor: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : 'grey.500',
-                                color: index < 3 ? 'black' : 'white',
-                                mr: 2,
-                                fontWeight: 'bold'
-                              }}
-                            >
-                              {index + 1}
-                            </Avatar>
-                            <Typography fontWeight="bold">
-                              {entry.username}
-                            </Typography>
-                          </Box>
+                  {leaderboard.default.map((entry, index) => (
+                    <ListItem
+                      key={index}
+                      sx={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: '12px',
+                        mb: 1,
+                        '&:hover': {
+                          transform: 'scale(1.02)',
+                          transition: 'transform 0.3s ease',
+                          backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        },
+                      }}
+                    >
+                      <Box display="flex" alignItems="center" width="100%" justifyContent="space-between">
+                        <Box display="flex" alignItems="center">
+                          <Avatar
+                             sx={{
+                               bgcolor: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : 'grey.500',
+                              color: index < 3 ? 'black' : 'white',
+                              mr: 2,
+                              fontWeight: 'bold'
+                            }}
+                          >
+                            {index + 1}
+                          </Avatar>
+                          <Typography fontWeight="bold">
+                            {entry.username}
+                          </Typography>
+                        </Box>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          {/* Always show time chip, but use N/A for legacy entries */}
+                          <Chip
+                            size="small"
+                            icon={<TimerIcon sx={{ fontSize: '0.8rem' }} />}
+                            label={entry.legacyFormat ? 'N/A' : formatTime(entry.time)}
+                            sx={{
+                              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                              color: '#fff',
+                            }}
+                          />
                           <Box
                             sx={{
                               display: 'inline-block',
@@ -1086,13 +1216,14 @@ const GuessGame = () => {
                             {entry.score} pts
                           </Box>
                         </Box>
-                      </ListItem>
-                    ))}
+                      </Box>
+                    </ListItem>
+                  ))}
                 </List>
               ) : (
-                <Typography variant="body1" sx={{ 
-                  mt: 2, 
-                  textAlign: 'center',
+                <Typography variant="body1" sx={{
+                   mt: 2,
+                   textAlign: 'center',
                   backgroundColor: 'rgba(255, 255, 255, 0.1)',
                   borderRadius: '8px',
                   p: 2
@@ -1101,49 +1232,56 @@ const GuessGame = () => {
                 </Typography>
               )}
             </Box>
-
             <Box>
-              <Typography variant="h6" gutterBottom sx={{ 
-                display: 'inline-block',
+              <Typography variant="h6" gutterBottom sx={{
+                 display: 'inline-block',
                 borderBottom: '3px solid #FFCF50',
                 paddingBottom: '4px'
               }}>
                 Full Game (Top 5)
               </Typography>
-              {leaderboard.all.length > 0 && leaderboard.all.filter(entry => entry.score > 0).length > 0 ? (
+              {leaderboard.all.length > 0 ? (
                 <List sx={{ width: '100%' }}>
-                  {leaderboard.all
-                    .filter(entry => entry.score > 0)
-                    .map((entry, index) => (
-                      <ListItem
-                        key={index}
-                        sx={{
-                          backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                          borderRadius: '12px',
-                          mb: 1,
-                          '&:hover': {
-                            transform: 'scale(1.02)',
-                            transition: 'transform 0.3s ease',
-                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                          },
-                        }}
-                      >
-                        <Box display="flex" alignItems="center" width="100%" justifyContent="space-between">
-                          <Box display="flex" alignItems="center">
-                            <Avatar 
-                              sx={{ 
-                                bgcolor: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : 'grey.500',
-                                color: index < 3 ? 'black' : 'white',
-                                mr: 2,
-                                fontWeight: 'bold'
-                              }}
-                            >
-                              {index + 1}
-                            </Avatar>
-                            <Typography fontWeight="bold">
-                              {entry.username}
-                            </Typography>
-                          </Box>
+                  {leaderboard.all.map((entry, index) => (
+                    <ListItem
+                      key={index}
+                      sx={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: '12px',
+                        mb: 1,
+                        '&:hover': {
+                          transform: 'scale(1.02)',
+                          transition: 'transform 0.3s ease',
+                          backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        },
+                      }}
+                    >
+                      <Box display="flex" alignItems="center" width="100%" justifyContent="space-between">
+                        <Box display="flex" alignItems="center">
+                          <Avatar
+                             sx={{
+                               bgcolor: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : 'grey.500',
+                              color: index < 3 ? 'black' : 'white',
+                              mr: 2,
+                              fontWeight: 'bold'
+                            }}
+                          >
+                            {index + 1}
+                          </Avatar>
+                          <Typography fontWeight="bold">
+                            {entry.username}
+                          </Typography>
+                        </Box>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <Chip
+                            size="small"
+                            icon={<TimerIcon sx={{ fontSize: '0.8rem' }} />}
+                            label={formatTime(entry.time)}
+                            sx={{
+                              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                              color: '#fff',
+                            }}
+                          />
                           <Box
                             sx={{
                               display: 'inline-block',
@@ -1158,13 +1296,14 @@ const GuessGame = () => {
                             {entry.score} pts
                           </Box>
                         </Box>
-                      </ListItem>
-                    ))}
+                      </Box>
+                    </ListItem>
+                  ))}
                 </List>
               ) : (
-                <Typography variant="body1" sx={{ 
-                  mt: 2, 
-                  textAlign: 'center',
+                <Typography variant="body1" sx={{
+                   mt: 2,
+                   textAlign: 'center',
                   backgroundColor: 'rgba(255, 255, 255, 0.1)',
                   borderRadius: '8px',
                   p: 2

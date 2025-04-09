@@ -1,6 +1,9 @@
 // components/Home.js
-import React from 'react';
-import { Paper, Typography, Grid, List, ListItem, ListItemText, Box, Avatar, useTheme, Divider } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Paper, Typography, Grid, List, ListItem, ListItemText, Box, Avatar, useTheme, Divider, CircularProgress } from '@mui/material';
+import { db } from '../firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { motion } from 'framer-motion';
 
 // Import your house logos here
 import yellowSparksLogo from './logo/yellow-sparks-logo.png';
@@ -12,11 +15,49 @@ const Home = () => {
   const textColor = theme.palette.mode === 'light' ? '#000000' : '#FFFFFF';
   const secondaryTextColor = theme.palette.mode === 'light' ? '#000000' : '#000000'; // Always black for badge text
   
-  const leaderBoard = [
-    { house: 1, houseName: "The Yellow Sparks", points: 110, logo: yellowSparksLogo },
-    { house: 2, houseName: "Sparta", points: 10, logo: spartaLogo },
-    { house: 3, houseName: "Mission FunPossible", points: 50, logo: missionFunPossibleLogo },
-  ];
+  const [leaderBoard, setLeaderBoard] = useState(null); // Initially null to indicate loading
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        const docRef = doc(db, "leaderboard", "totalScore");
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setLeaderBoard([
+            { house: 1, houseName: "The Yellow Sparks", points: data["The Yellow Sparks"] || 0, logo: yellowSparksLogo },
+            { house: 2, houseName: "Sparta", points: data["Sparta"] || 0, logo: spartaLogo },
+            { house: 3, houseName: "Mission FunPossible", points: data["Mission FunPossible"] || 0, logo: missionFunPossibleLogo },
+          ]);
+        } else {
+          throw new Error("No data found");
+        }
+      } catch (error) {
+        console.error("Error fetching leaderboard data: ", error);
+        // Fallback to hardcoded values
+        setLeaderBoard([
+          { house: 1, houseName: "The Yellow Sparks", points: 210, logo: yellowSparksLogo },
+          { house: 2, houseName: "Sparta", points: 60, logo: spartaLogo },
+          { house: 3, houseName: "Mission FunPossible", points: 150, logo: missionFunPossibleLogo },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLeaderboard();
+  }, []);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   // Sort leaderboard by points in descending order
   const sortedLeaderBoard = leaderBoard.sort((a, b) => b.points - a.points);
   
@@ -69,52 +110,58 @@ const Home = () => {
           </Typography>
           <List>
             {sortedLeaderBoard.map((item) => (
-              <ListItem
+              <motion.div
                 key={item.house}
-                sx={{
-                  '&:hover': {
-                    transform: 'scale(1.05)',
-                    transition: 'transform 0.3s ease',
-                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                  },
-                }}
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: item.house * 0.2 }}
               >
-                <Box display="flex" alignItems="center">
-                  <Avatar
-                    src={item.logo}
-                    alt={`${item.houseName} Logo`}
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: '8px',
-                      marginRight: '16px',
-                      boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.5)',
-                    }}
-                  />
-                  <ListItemText
-                    primary={
-                      <Typography color={textColor} variant="body1" fontWeight="medium">
-                        {item.houseName}
-                      </Typography>
-                    }
-                    secondary={
-                      <Box
-                        sx={{
-                          display: 'inline-block',
-                          padding: '4px 8px',
-                          backgroundColor: '#ffffff',
-                          color: secondaryTextColor,
-                          borderRadius: '12px',
-                          fontWeight: 'bold',
-                          boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
-                        }}
-                      >
-                        Points: {item.points}
-                      </Box>
-                    }
-                  />
-                </Box>
-              </ListItem>
+                <ListItem
+                  sx={{
+                    '&:hover': {
+                      transform: 'scale(1.05)',
+                      transition: 'transform 0.3s ease',
+                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    },
+                  }}
+                >
+                  <Box display="flex" alignItems="center">
+                    <Avatar
+                      src={item.logo}
+                      alt={`${item.houseName} Logo`}
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: '8px',
+                        marginRight: '16px',
+                        boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.5)',
+                      }}
+                    />
+                    <ListItemText
+                      primary={
+                        <Typography color={textColor} variant="body1" fontWeight="medium">
+                          {item.houseName}
+                        </Typography>
+                      }
+                      secondary={
+                        <Box
+                          sx={{
+                            display: 'inline-block',
+                            padding: '4px 8px',
+                            backgroundColor: '#ffffff',
+                            color: secondaryTextColor,
+                            borderRadius: '12px',
+                            fontWeight: 'bold',
+                            boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
+                          }}
+                        >
+                          Points: {item.points}
+                        </Box>
+                      }
+                    />
+                  </Box>
+                </ListItem>
+              </motion.div>
             ))}
           </List>
         </Paper>

@@ -1,12 +1,31 @@
 {
   "files": {
     "main.css": "/tccl/static/css/main.e6c13ad2.css",
-    "main.js": "/tccl/static/js/main.b96a2534.js",
+    "main.js": "/tccl/static/js/main.0b41722f.js",
     "static/js/453.25e43774.chunk.js": "/tccl/static/js/453.25e43774.chunk.js",
     "static/media/yellow-sparks-logo.png": "/tccl/static/media/yellow-sparks-logo.d7df932322b30987426f.png",
     "static/media/trimble-cloud-championship-league-logo.png": "/tccl/static/media/trimble-cloud-championship-league-logo.ff19a7edc4ba16506de7.png",
     "static/media/mission-fun-possible-logo.png": "/tccl/static/media/mission-fun-possible-logo.97de1ff8f37c7127c38d.png",
+    "static/media/IMG_4635.JPG": "/tccl/static/media/IMG_4635.78e9eba0ac7ebbde4383.JPG",
+    "static/media/IMG_4634.JPG": "/tccl/static/media/IMG_4634.78d83259580b2289cd2c.JPG",
+    "static/media/IMG_4650.JPG": "/tccl/static/media/IMG_4650.8a10fbe07e34a6c617b2.JPG",
+    "static/media/IMG_4675.JPG": "/tccl/static/media/IMG_4675.8e846649fd8bc8b7b3bf.JPG",
+    "static/media/IMG_4672.JPG": "/tccl/static/media/IMG_4672.1abc3cf6e1b4f059918a.JPG",
+    "static/media/IMG_4671.JPG": "/tccl/static/media/IMG_4671.d39c04a503033d2b15bc.JPG",
+    "static/media/IMG_4652.JPG": "/tccl/static/media/IMG_4652.c5d135d019119222bd75.JPG",
+    "static/media/IMG_4641.JPG": "/tccl/static/media/IMG_4641.31db66cbe259913f8ac3.JPG",
+    "static/media/IMG_4654.JPG": "/tccl/static/media/IMG_4654.7139b376167167b71410.JPG",
+    "static/media/IMG_4645.JPG": "/tccl/static/media/IMG_4645.76e529e2d78f5b764e68.JPG",
+    "static/media/IMG_4657.JPG": "/tccl/static/media/IMG_4657.90794d06a2978a720d27.JPG",
+    "static/media/IMG_4642.JPG": "/tccl/static/media/IMG_4642.9d1699b53031ec99122b.JPG",
     "static/media/participant_santhosh_kumar.jpg": "/tccl/static/media/participant_santhosh_kumar.fbb50f277962a8f787ea.jpg",
+    "static/media/IMG_4701.JPG": "/tccl/static/media/IMG_4701.2e1a9c5ddd0c64cd74d5.JPG",
+    "static/media/IMG_4658.JPG": "/tccl/static/media/IMG_4658.d3849de956c6053c8f5e.JPG",
+    "static/media/IMG_4696.JPG": "/tccl/static/media/IMG_4696.6298de0e2e40cf33525e.JPG",
+    "static/media/IMG_4698.JPG": "/tccl/static/media/IMG_4698.19d301b082cf2af98b69.JPG",
+    "static/media/IMG_4695.JPG": "/tccl/static/media/IMG_4695.417ac77f31b98b97e9b6.JPG",
+    "static/media/IMG_4690.JPG": "/tccl/static/media/IMG_4690.a850301eac8bc211619f.JPG",
+    "static/media/IMG_4694.JPG": "/tccl/static/media/IMG_4694.b6ae9b31969abe7fcab5.JPG",
     "static/media/participant_dhivyadharshini_t.jpg": "/tccl/static/media/participant_dhivyadharshini_t.b5201de31c0db24e02ba.jpg",
     "static/media/participant_preethi_rangamma.jpg": "/tccl/static/media/participant_preethi_rangamma.d5ddeaa1f3a8dae225eb.jpg",
     "static/media/participant_raahavi_m.jpg": "/tccl/static/media/participant_raahavi_m.91100255b3bfbb093426.jpg",
@@ -111,11 +130,11 @@
     "static/media/participant_infant_shiny_a.jpg": "/tccl/static/media/participant_infant_shiny_a.a39820ff89165b3aaa36.jpg",
     "index.html": "/tccl/index.html",
     "main.e6c13ad2.css.map": "/tccl/static/css/main.e6c13ad2.css.map",
-    "main.b96a2534.js.map": "/tccl/static/js/main.b96a2534.js.map",
+    "main.0b41722f.js.map": "/tccl/static/js/main.0b41722f.js.map",
     "453.25e43774.chunk.js.map": "/tccl/static/js/453.25e43774.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.b96a2534.js"
+    "static/js/main.0b41722f.js"
   ]
 }

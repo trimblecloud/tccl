@@ -32,13 +32,15 @@ import {
   People as PeopleIcon,
   ViewList as FixturesIcon,
   Games as GameIcon,
-  Close as CloseIcon
+  Close as CloseIcon,
+  PhotoLibrary as PhotoLibraryIcon
 } from '@mui/icons-material';
 import Home from './components/Home';
 import Events from './components/Events';
 import Participants from './components/Participants';
 import GuessGame from './components/GuessGame';
 import Fixtures from './components/Fixtures';
+import Gallery from './components/Gallery';
 import logo from './components/logo/trimble-cloud-championship-league-logo.png';
 
 // Navigation menu items definition
@@ -48,6 +50,7 @@ const menuItems = [
   { label: 'Fixtures', path: '/fixtures', icon: <FixturesIcon /> },
   { label: 'House Members', path: '/participants', icon: <PeopleIcon /> },
   { label: 'Guess Game', path: '/guessgame', icon: <GameIcon /> },
+  { label: 'Gallery', path: '/gallery', icon: <PhotoLibraryIcon /> },
 ];
 
 // Navigation link component that handles active state
@@ -297,6 +300,7 @@ function App() {
             <Route path="/fixtures" element={<Fixtures />} />
             <Route path="/participants" element={<Participants />} />
             <Route path="/guessgame" element={<GuessGame />} />
+            <Route path="/gallery" element={<Gallery />} />
           </Routes>
         </Container>
         

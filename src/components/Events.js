@@ -78,12 +78,12 @@ const Events = () => {
     },
     { 
       name: 'Badminton(Doubles) Men/Women/Mixed', 
-      dates: ['11-April-2025', '12-April-2025'], 
+      dates: ['TBD-April-2025', 'TDB-April-2025'], 
       time: '16:00-19:00' 
     },
     { 
       name: 'Carrom', 
-      dates: ['16-April-2025', '17-April-2025'], 
+      dates: ['TDB-April-2025', 'TDB-April-2025'], 
       time: '16:30-18:30' 
     },
     { 

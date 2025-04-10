@@ -1,14 +1,192 @@
 // components/Home.js
 import React, { useEffect, useState } from 'react';
-import { Paper, Typography, Grid, List, ListItem, ListItemText, Box, Avatar, useTheme, Divider, CircularProgress } from '@mui/material';
+import { 
+  Paper, Typography, Grid, List, ListItem, ListItemText, Box, 
+  Avatar, useTheme, Divider, CircularProgress, Button, 
+  Table, TableBody, TableCell, TableContainer, TableHead, 
+  TableRow, Collapse, IconButton
+} from '@mui/material';
 import { db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { motion } from 'framer-motion';
+import { KeyboardArrowDown, KeyboardArrowUp, EmojiEvents } from '@mui/icons-material';
 
 // Import your house logos here
 import yellowSparksLogo from './logo/yellow-sparks-logo.png';
 import spartaLogo from './logo/sparta-logo.png';
 import missionFunPossibleLogo from './logo/mission-fun-possible-logo.png';
+
+// Detailed scores data - structured for extensibility
+const detailedScores = {
+  categories: [
+    { id: "house_details", name: "House Details Submission" },
+    { id: "bet_your_brain_submission", name: "Game 1 - Bet Your Brain Participants Submission" },
+    { id: "bet_your_brain", name: "Game 1 - Bet Your Brain" },
+    { id: "tt_group_participation", name: "Game 2 - TT Doubles - Group Stage Participation" },
+    { id: "tt_group_runners", name: "Game 2 - TT Doubles - Group Stage Runners" },
+    { id: "tt_semis_participation", name: "Game 2 - TT Doubles - Semis Participation" },
+    { id: "tt_semis_runners", name: "Game 2 - TT Doubles - Semis Runners" },
+    { id: "tt_runners", name: "Game 2 - TT Doubles - Runners" },
+    { id: "tt_winners", name: "Game 2 - TT Doubles - Winners" },
+    // Add new categories here
+  ],
+  houses: [
+    { 
+      id: "yellow_sparks", 
+      name: "The Yellow Sparks", 
+      logo: yellowSparksLogo,
+      points: {
+        "house_details": 0,
+        "bet_your_brain_submission": 10,
+        "bet_your_brain": 100,
+        "tt_group_participation": 10,
+        "tt_group_runners": 20,
+        "tt_semis_participation": 30,
+        "tt_semis_runners": 80,
+        "tt_runners": 0,
+        "tt_winners": 0,
+      }
+    },
+    { 
+      id: "sparta", 
+      name: "Sparta", 
+      logo: spartaLogo,
+      points: {
+        "house_details": 5,
+        "bet_your_brain_submission": 5,
+        "bet_your_brain": 0,
+        "tt_group_participation": 30,
+        "tt_group_runners": 20,
+        "tt_semis_participation": 0,
+        "tt_semis_runners": 0,
+        "tt_runners": 70,
+        "tt_winners": 100,
+      }
+    },
+    { 
+      id: "mission_funpossible", 
+      name: "Mission FunPossible", 
+      logo: missionFunPossibleLogo,
+      points: {
+        "house_details": 0,
+        "bet_your_brain_submission": 0,
+        "bet_your_brain": 50,
+        "tt_group_participation": 20,
+        "tt_group_runners": 80,
+        "tt_semis_participation": 30,
+        "tt_semis_runners": 0,
+        "tt_runners": 0,
+        "tt_winners": 0,  
+      }
+    },
+  ]
+};
+
+// Calculate total points for each house
+detailedScores.houses.forEach(house => {
+  house.totalPoints = Object.values(house.points).reduce((sum, points) => sum + points, 0);
+});
+
+const DetailedScoreTable = () => {
+  const [open, setOpen] = useState(false);
+  const theme = useTheme();
+  
+  return (
+    <Box sx={{ width: '100%', mb: 3 }}>
+      <Button 
+        variant="contained" 
+        onClick={() => setOpen(!open)}
+        startIcon={<EmojiEvents />}
+        endIcon={open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+        sx={{
+          mb: 2,
+          backgroundImage: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)',
+          '&:hover': {
+            backgroundImage: 'linear-gradient(135deg, #F57C00 0%, #E65100 100%)',
+          }
+        }}
+      >
+        {open ? "Hide Detailed Scores" : "View Detailed Scores"}
+      </Button>
+      
+      <Collapse in={open} timeout="auto" unmountOnExit>
+      <Typography variant="body1" gutterBottom sx={{ mb: 3, textAlign: { xs: 'center', md: 'left' } }}>
+      Updated on 10th April 2025
+    </Typography>
+        <TableContainer component={Paper} elevation={3} sx={{ overflow: 'auto', borderRadius: '12px' }}>
+          <Table aria-label="detailed scores table">
+            <TableHead>
+              <TableRow sx={{ backgroundColor: theme.palette.mode === 'light' ? '#f5f5f5' : '#333' }}>
+                <TableCell>Category</TableCell>
+                {detailedScores.houses.map((house) => (
+                  <TableCell key={house.id} align="center">
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <Avatar 
+                        src={house.logo} 
+                        alt={house.name} 
+                        sx={{ width: 30, height: 30, mb: 1 }}
+                      />
+                      {house.name}
+                    </Box>
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {detailedScores.categories.map((category) => (
+                <TableRow 
+                  key={category.id}
+                  sx={{ 
+                    '&:nth-of-type(odd)': { 
+                      backgroundColor: theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.03)' : 'rgba(255, 255, 255, 0.05)' 
+                    },
+                    '&:hover': {
+                      backgroundColor: theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.07)' : 'rgba(255, 255, 255, 0.1)'
+                    }
+                  }}
+                >
+                  <TableCell component="th" scope="row">
+                    {category.name}
+                  </TableCell>
+                  {detailedScores.houses.map((house) => (
+                    <TableCell 
+                      key={`${house.id}-${category.id}`} 
+                      align="center"
+                      sx={{ 
+                        fontWeight: house.points[category.id] > 0 ? 'bold' : 'normal',
+                        color: house.points[category.id] > 0 ? theme.palette.primary.main : theme.palette.text.secondary
+                      }}
+                    >
+                      {house.points[category.id]}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+              <TableRow sx={{ backgroundColor: theme.palette.mode === 'light' ? '#e3f2fd' : '#102027', fontWeight: 'bold' }}>
+                <TableCell component="th" scope="row" sx={{ fontWeight: 'bold' }}>
+                  TOTAL
+                </TableCell>
+                {detailedScores.houses.map((house) => (
+                  <TableCell 
+                    key={`${house.id}-total`} 
+                    align="center"
+                    sx={{ 
+                      fontWeight: 'bold',
+                      fontSize: '1.1rem',
+                      color: theme.palette.mode === 'light' ? '#0d47a1' : '#90caf9'
+                    }}
+                  >
+                    {house.totalPoints}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Collapse>
+    </Box>
+  );
+};
 
 const Home = () => {
   const theme = useTheme();
@@ -164,6 +342,9 @@ const Home = () => {
               </motion.div>
             ))}
           </List>
+          <Grid item xs={12}>
+        <DetailedScoreTable />
+      </Grid>
         </Paper>
       </Grid>
       <Grid item xs={12}>
@@ -276,6 +457,7 @@ const Home = () => {
     </Grid>
   </Paper>
 </Grid>
+
     </Grid>
   );
 };

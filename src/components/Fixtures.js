@@ -90,6 +90,7 @@ const Fixtures = () => {
   const theme = useTheme();
   const [expandedSection, setExpandedSection] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(0);
+  const [currentDate] = useState(new Date()); // Get current date once when component mounts
 
   const handleAccordionChange = (panel) => (event, isExpanded) => {
     setExpandedSection(isExpanded ? panel : null);
@@ -99,8 +100,64 @@ const Fixtures = () => {
     setSelectedEvent(newValue);
   };
   
+  // Helper function to parse date strings
+  const parseEventDate = (dateStr) => {
+    // Extract the date part (e.g., "22nd April 2025" from "22nd April 2025 (Tuesday)")
+    const datePart = dateStr.split(' (')[0];
+    
+    // Extract day, month, and year
+    const dayMatch = datePart.match(/(\d+)(st|nd|rd|th)/);
+    const day = dayMatch ? parseInt(dayMatch[1], 10) : 1;
+    
+    const monthMatch = datePart.match(/(January|February|March|April|May|June|July|August|September|October|November|December)/i);
+    const month = monthMatch ? new Date(Date.parse(monthMatch[1] + " 1, 2000")).getMonth() : 0;
+    
+    const yearMatch = datePart.match(/\d{4}/);
+    const year = yearMatch ? parseInt(yearMatch[0], 10) : 2025;
+    
+    return new Date(year, month, day);
+  };
+  
+  // Helper function to determine event status
+  const determineEventStatus = (timings) => {
+    if (!timings || timings.length === 0) return 'upcoming';
+    
+    // Get first and last day of the event
+    const firstDay = parseEventDate(timings[0].date);
+    const lastDay = parseEventDate(timings[timings.length - 1].date);
+    
+    // Add one day to last day to include the entire day
+    lastDay.setDate(lastDay.getDate() + 1);
+    
+    if (currentDate > lastDay) return 'completed';
+    if (currentDate >= firstDay && currentDate < lastDay) return 'active';
+    return 'upcoming';
+  };
+  
   // All tournaments data combined
-  const allTournaments = [
+  const allTournaments = [   {
+      id: 'chess',
+      name: 'Chess',
+      icon: <ViewCompactIcon />,
+      color: '#4CAF50', // Green
+      categories: ['Indoor', 'Board Games'],
+      description: 'Classic strategy board game with tournament format.',
+      venue: '3rd Floor',
+      timings: [
+        { date: '28th April 2025 (Monday)', details: 'Round 1 and Round 2' },
+        { date: '29th April 2025 (Tuesday)', details: 'Round 3 and Quarter-Finals' },
+        { date: '30th April 2025 (Wednesday)', details: 'Semi-Finals and Finals' }
+      ],
+      fixtures: [
+        {
+          title: 'Tournament Bracket',
+          url: 'https://challonge.com/tccl_chess/module',
+          notes: [
+            'It is going to be a knockout format!',
+          ]
+        }
+      ]
+    },
     {
       id: 'carrom',
       name: 'Carrom',
@@ -109,7 +166,6 @@ const Fixtures = () => {
       categories: ['Indoor', 'Board Games'],
       description: 'Indoor board game',
       venue: '3rd Floor Recreation Area',
-      status: 'upcoming',
       timings: [
         { date: '22nd April 2025 (Tuesday)', details: 'Group Stage Day 1' },
         { date: '23rd April 2025 (Wednesday)', details: 'Group Stage Day 2' },
@@ -125,8 +181,7 @@ const Fixtures = () => {
           ]
         }
       ]
-    },
-    {
+    },    {
       id: 'table-tennis',
       name: 'Table Tennis',
       icon: <SportsTennisIcon />,
@@ -134,7 +189,6 @@ const Fixtures = () => {
       categories: ['Indoor', 'Sports'],
       description: 'Teams are divided into 6 groups. Each group has 3 teams. Top team from each group advances to Semifinal League.',
       venue: '5th Floor TT Play Area',
-      status: 'completed',
       timings: [
         { 
           date: '2nd April 2025 (Wednesday)', 
@@ -167,33 +221,7 @@ const Fixtures = () => {
           notes: []
         }
       ]
-    },
-    {
-      id: 'chess',
-      name: 'Chess',
-      icon: <ViewCompactIcon />,
-      color: '#4CAF50', // Green
-      categories: ['Indoor', 'Board Games'],
-      description: 'Classic strategy board game with tournament format.',
-      venue: '3rd Floor TBD',
-      status: 'upcoming',
-      timings: [
-        { date: '24th April 2025 (Thursday)', details: 'Round 1 and Round 2' },
-        { date: '25th April 2025 (Friday)', details: 'Round 3 and Quarter-Finals' },
-        { date: '26th April 2025 (Monday)', details: 'Semi-Finals' },
-        { date: '29th April 2025 (Tuesday)', details: 'Finals 🏆' },
-      ],
-      fixtures: [
-        {
-          title: 'Tournament Bracket',
-          url: 'https://challonge.com/trimblecloud/chess2025/module',
-          notes: [
-            'Rules TBD'
-          ]
-        }
-      ]
-    },
-    {
+    },    {
       id: 'badminton',
       name: 'Badminton (Doubles)',
       icon: <SportsTennisIcon />,
@@ -201,7 +229,6 @@ const Fixtures = () => {
       categories: ['Indoor', 'Sports'],
       description: 'Doubles tournament with men\'s, women\'s, and mixed categories.',
       venue: 'TBD',
-      status: 'upcoming',
       timings: [
         { 
           date: '15th May 2025 (Thursday)', 
@@ -227,8 +254,7 @@ const Fixtures = () => {
           notes: []
         }
       ]
-    },
-    {
+    },    {
       id: 'cricket',
       name: 'Cricket',
       icon: <SportsCricketIcon />,
@@ -236,7 +262,6 @@ const Fixtures = () => {
       categories: ['Outdoor', 'Sports', 'Team'],
       description: 'Morning cricket tournament between house teams.',
       venue: 'TBD Cricket Ground',
-      status: 'upcoming',
       timings: [
         { date: '10th May 2025 (Saturday)', details: 'All matches from 6:00 AM to 11:00 AM' },
       ],
@@ -271,16 +296,20 @@ const Fixtures = () => {
   // Render tournament fixtures
   const renderTournamentFixtures = (tournament) => (
     <Box>
-      {/* Categories */}
-      <Box sx={{ mb: 2, display: 'flex', flexWrap: 'wrap' }}>
+      {/* Categories */}      <Box sx={{ mb: 2, display: 'flex', flexWrap: 'wrap' }}>
         {tournament.categories.map((category, idx) => (
           <StyledCategoryChip key={idx} label={category} size="small" />
         ))}
-        <StyledCategoryChip 
-          label={tournament.status === 'completed' ? 'Completed' : 'Upcoming'} 
-          size="small"
-          color={tournament.status === 'completed' ? 'success' : 'primary'}
-        />
+        {(() => {
+          const status = determineEventStatus(tournament.timings);
+          return (
+            <StyledCategoryChip 
+              label={status === 'completed' ? 'Completed' : status === 'active' ? 'Active' : 'Upcoming'} 
+              size="small"
+              color={status === 'completed' ? 'success' : status === 'active' ? 'warning' : 'primary'}
+            />
+          );
+        })()}
       </Box>
 
       <Typography variant="h6" gutterBottom sx={{ 
@@ -600,53 +629,75 @@ const Fixtures = () => {
             sx={{ display: selectedEvent === index ? 'block' : 'none' }}
           >
             <Fade in={selectedEvent === index} timeout={500}>
-              <Box>
-                <Box 
-                  sx={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: 2, 
-                    mb: 3,
-                    p: 2,
-                    borderRadius: '12px',
-                    bgcolor: tournament.status === 'completed'
-                      ? theme.palette.mode === 'light' 
-                        ? 'rgba(102, 187, 106, 0.1)'
-                        : 'rgba(102, 187, 106, 0.2)'
-                      : theme.palette.mode === 'light'
-                        ? 'rgba(33, 150, 243, 0.1)'
-                        : 'rgba(33, 150, 243, 0.2)',
-                    border: '1px solid',
-                    borderColor: tournament.status === 'completed'
-                      ? theme.palette.mode === 'light' 
-                        ? 'rgba(102, 187, 106, 0.3)'
-                        : 'rgba(102, 187, 106, 0.4)'
-                      : theme.palette.mode === 'light'
-                        ? 'rgba(33, 150, 243, 0.3)'
-                        : 'rgba(33, 150, 243, 0.4)',
-                  }}
-                >
-                  <TournamentIcon color={tournament.color}>
-                    {tournament.icon}
-                  </TournamentIcon>
-                  <Box>
-                    <Typography 
-                      variant="h5" 
-                      fontWeight="bold"
-                      sx={{ color: theme.palette.mode === 'dark' ? '#fff' : 'inherit' }}
-                    >
-                      {tournament.name}
-                    </Typography>
-                    <Typography 
-                      variant="body2" 
+              <Box>                {(() => {
+                  const status = determineEventStatus(tournament.timings);
+                  const statusColors = {
+                    completed: {
+                      bg: theme.palette.mode === 'light' ? 'rgba(102, 187, 106, 0.1)' : 'rgba(102, 187, 106, 0.2)',
+                      border: theme.palette.mode === 'light' ? 'rgba(102, 187, 106, 0.3)' : 'rgba(102, 187, 106, 0.4)',
+                      text: '#4CAF50'
+                    },
+                    active: {
+                      bg: theme.palette.mode === 'light' ? 'rgba(255, 152, 0, 0.1)' : 'rgba(255, 152, 0, 0.2)',
+                      border: theme.palette.mode === 'light' ? 'rgba(255, 152, 0, 0.3)' : 'rgba(255, 152, 0, 0.4)',
+                      text: '#FF9800'
+                    },
+                    upcoming: {
+                      bg: theme.palette.mode === 'light' ? 'rgba(33, 150, 243, 0.1)' : 'rgba(33, 150, 243, 0.2)',
+                      border: theme.palette.mode === 'light' ? 'rgba(33, 150, 243, 0.3)' : 'rgba(33, 150, 243, 0.4)',
+                      text: '#2196F3'
+                    }
+                  };
+                  
+                  return (
+                    <Box 
                       sx={{ 
-                        color: theme.palette.mode === 'light' ? 'text.secondary' : 'rgba(255, 255, 255, 0.7)'
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: 2, 
+                        mb: 3,
+                        p: 2,
+                        borderRadius: '12px',
+                        bgcolor: statusColors[status].bg,
+                        border: '1px solid',
+                        borderColor: statusColors[status].border,
                       }}
                     >
-                      Status: {tournament.status === 'completed' ? 'Completed' : 'Upcoming'}
-                    </Typography>
-                  </Box>
-                </Box>
+                      <TournamentIcon color={tournament.color}>
+                        {tournament.icon}
+                      </TournamentIcon>
+                      <Box>
+                        <Typography 
+                          variant="h5" 
+                          fontWeight="bold"
+                          sx={{ color: theme.palette.mode === 'dark' ? '#fff' : 'inherit' }}
+                        >
+                          {tournament.name}
+                        </Typography>                        <Typography 
+                          variant="body2" 
+                          sx={{ 
+                            color: theme.palette.mode === 'light' ? statusColors[status].text : 'rgba(255, 255, 255, 0.9)',
+                            fontWeight: 'medium',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.5
+                          }}
+                        >
+                          {status === 'completed' ? '✓' : status === 'active' ? '⚡' : '🕒'} 
+                          Status: {status === 'completed' ? 'Completed' : status === 'active' ? 'In Progress' : 'Upcoming'}
+                          {status === 'active' && (
+                            <Chip 
+                              label="HAPPENING NOW" 
+                              size="small" 
+                              color="warning" 
+                              sx={{ ml: 1, height: 20, fontSize: '0.6rem' }}
+                            />
+                          )}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  );
+                })()}
                 {renderTournamentFixtures(tournament)}
               </Box>
             </Fade>

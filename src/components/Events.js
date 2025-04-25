@@ -148,7 +148,7 @@ const Events = () => {
     { 
       name: 'Carrom',
       startDate: '4/22/2025',
-      endDate: '4/25/2025',
+      endDate: '4/24/2025',
       dayInfo: '4 days (Tues - Fri)',
       time: '4:30 - 6:30 PM',
       details: 'Show your skills in this popular board game.',
@@ -156,8 +156,8 @@ const Events = () => {
     },
     { 
       name: 'Chess',
-      startDate: '4/24/2025',
-      endDate: '4/29/2025',
+      startDate: '4/28/2025',
+      endDate: '4/30/2025',
       dayInfo: '4 Days (Thurs - Tues)',
       time: '4:00 - 6:00 PM',
       details: 'Strategic chess tournament for all skill levels.',
@@ -165,8 +165,8 @@ const Events = () => {
     },
     { 
       name: 'Build your Logo',
-      startDate: '4/30/2025',
-      endDate: '4/30/2025',
+      startDate: '5/07/2025',
+      endDate: '5/07/2025',
       dayInfo: 'Wednesday',
       time: '4:00 - 5:00 PM',
       details: 'Creative competition to design and build team logos.',
@@ -174,8 +174,8 @@ const Events = () => {
     },
     { 
       name: 'Cards Tower',
-      startDate: '5/7/2025',
-      endDate: '5/7/2025',
+      startDate: '4/30/2025',
+      endDate: '4/30/2025',
       dayInfo: 'Wednesday',
       time: '4:00 - 5:00 PM',
       details: 'Build the highest card tower in this women-only precision challenge.',

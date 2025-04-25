@@ -28,6 +28,12 @@ const detailedScores = {
     { id: "tt_semis_runners", name: "Game 2 - TT Doubles - Semis Runners" },
     { id: "tt_runners", name: "Game 2 - TT Doubles - Runners" },
     { id: "tt_winners", name: "Game 2 - TT Doubles - Winners" },
+    { id: "carrom_r1_participation", name: "Game 3 - Carrom - Round 1 Participation" },
+    { id: "carrom_r2_participation", name: "Game 3 - Carrom - Round 2 Participation" },
+    { id: "carrom_r3_participation", name: "Game 3 - Carrom - Round 3 Participation" },
+    { id: "carrom_semi_finals", name: "Game 3 - Carrom - Semi Finals" },
+    { id: "carrom_runners", name: "Game 3 - Carrom - Runners" },
+    { id: "carrom_winners", name: "Game 3 - Carrom - Winners" },
     // Add new categories here
   ],
   houses: [
@@ -35,6 +41,7 @@ const detailedScores = {
       id: "yellow_sparks", 
       name: "The Yellow Sparks", 
       logo: yellowSparksLogo,
+      color: "#FFD600",
       points: {
         "house_details": 0,
         "bet_your_brain_submission": 10,
@@ -45,12 +52,19 @@ const detailedScores = {
         "tt_semis_runners": 80,
         "tt_runners": 0,
         "tt_winners": 0,
+        "carrom_r1_participation": 30,
+        "carrom_r2_participation": 40,
+        "carrom_r3_participation": 30,
+        "carrom_semi_finals": 80,
+        "carrom_runners": 70,
+        "carrom_winners": 0,
       }
     },
     { 
       id: "sparta", 
       name: "Sparta", 
       logo: spartaLogo,
+      color: "#F44336",
       points: {
         "house_details": 5,
         "bet_your_brain_submission": 5,
@@ -61,12 +75,19 @@ const detailedScores = {
         "tt_semis_runners": 0,
         "tt_runners": 70,
         "tt_winners": 100,
+        "carrom_r1_participation": 30,
+        "carrom_r2_participation": 60,
+        "carrom_r3_participation": 30,
+        "carrom_semi_finals": 0,
+        "carrom_runners": 0,
+        "carrom_winners": 0,
       }
     },
     { 
       id: "mission_funpossible", 
       name: "Mission FunPossible", 
       logo: missionFunPossibleLogo,
+      color: "#2196F3",
       points: {
         "house_details": 0,
         "bet_your_brain_submission": 0,
@@ -77,6 +98,12 @@ const detailedScores = {
         "tt_semis_runners": 0,
         "tt_runners": 0,
         "tt_winners": 0,  
+        "carrom_r1_participation": 10,
+        "carrom_r2_participation": 60,
+        "carrom_r3_participation": 60,
+        "carrom_semi_finals": 0,
+        "carrom_runners": 0,
+        "carrom_winners": 100,
       }
     },
   ]
@@ -89,10 +116,28 @@ detailedScores.houses.forEach(house => {
 
 const DetailedScoreTable = () => {
   const [open, setOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('all');
   const theme = useTheme();
   
+  // Group categories by game
+  const gameCategories = {
+    'all': detailedScores.categories,
+    'general': detailedScores.categories.filter(cat => cat.id.includes('house_details')),
+    'game1': detailedScores.categories.filter(cat => cat.id.includes('bet_your_brain')),
+    'game2': detailedScores.categories.filter(cat => cat.id.includes('tt_')),
+    'game3': detailedScores.categories.filter(cat => cat.id.includes('carrom_')),
+  };
+  
+  const gameLabels = {
+    'all': 'All Events',
+    'general': 'General',
+    'game1': 'Bet Your Brain',
+    'game2': 'Table Tennis Doubles',
+    'game3': 'Carrom',
+  };
+  
   return (
-    <Box sx={{ width: '100%', mb: 3 }}>
+    <Box sx={{ width: '100%', mb: 4 }}>
       <Button 
         variant="contained" 
         onClick={() => setOpen(!open)}
@@ -101,8 +146,13 @@ const DetailedScoreTable = () => {
         sx={{
           mb: 2,
           backgroundImage: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)',
+          borderRadius: '12px',
+          padding: '10px 20px',
+          transition: 'all 0.2s ease',
           '&:hover': {
             backgroundImage: 'linear-gradient(135deg, #F57C00 0%, #E65100 100%)',
+            transform: 'translateY(-2px)',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
           }
         }}
       >
@@ -110,30 +160,122 @@ const DetailedScoreTable = () => {
       </Button>
       
       <Collapse in={open} timeout="auto" unmountOnExit>
-      <Typography variant="body1" gutterBottom sx={{ mb: 3, textAlign: { xs: 'center', md: 'left' } }}>
-      Updated on 10th April 2025
-    </Typography>
-        <TableContainer component={Paper} elevation={3} sx={{ overflow: 'auto', borderRadius: '12px' }}>
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 2,
+          flexDirection: {xs: 'column', sm: 'row'},
+          gap: 2
+        }}>
+          <Typography variant="body1" gutterBottom sx={{ mb: {xs: 0, sm: 0}, fontWeight: 'medium' }}>
+            <span style={{ backgroundColor: '#4CAF50', color: 'white', padding: '3px 8px', borderRadius: '4px', marginRight: '8px' }}>
+              Updated
+            </span>
+            April 25, 2025
+          </Typography>
+          
+          <Box sx={{ 
+            display: 'flex', 
+            gap: 1, 
+            flexWrap: 'wrap',
+            justifyContent: {xs: 'center', sm: 'flex-end'}
+          }}>
+            {Object.keys(gameLabels).map(tab => (
+              <Button
+                key={tab}
+                variant={activeTab === tab ? "contained" : "outlined"}
+                size="small"
+                onClick={() => setActiveTab(tab)}
+                sx={{
+                  borderRadius: '20px',
+                  minWidth: '80px',
+                  backgroundColor: activeTab === tab ? 
+                    (tab === 'all' ? '#673AB7' : 
+                     tab === 'game1' ? '#FF9800' : 
+                     tab === 'game2' ? '#2196F3' : 
+                     tab === 'game3' ? '#F44336' : '#4CAF50') : 'transparent',
+                  '&:hover': {
+                    backgroundColor: activeTab === tab ? 
+                      (tab === 'all' ? '#5E35B1' : 
+                       tab === 'game1' ? '#FB8C00' : 
+                       tab === 'game2' ? '#1E88E5' : 
+                       tab === 'game3' ? '#E53935' : '#43A047') : 'rgba(0,0,0,0.04)'
+                  },
+                  color: activeTab === tab ? '#fff' : theme.palette.text.primary,
+                  textTransform: 'none',
+                }}
+              >
+                {gameLabels[tab]}
+              </Button>
+            ))}
+          </Box>
+        </Box>
+        
+        <TableContainer 
+          component={Paper} 
+          elevation={4} 
+          sx={{ 
+            overflow: 'auto', 
+            borderRadius: '16px',
+            '&::-webkit-scrollbar': {
+              height: '8px',
+            },
+            '&::-webkit-scrollbar-track': {
+              backgroundColor: theme.palette.mode === 'light' ? '#f1f1f1' : '#333',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: theme.palette.mode === 'light' ? '#888' : '#555',
+              borderRadius: '4px',
+            }
+          }}
+        >
           <Table aria-label="detailed scores table">
             <TableHead>
-              <TableRow sx={{ backgroundColor: theme.palette.mode === 'light' ? '#f5f5f5' : '#333' }}>
-                <TableCell>Category</TableCell>
+              <TableRow sx={{ 
+                backgroundColor: theme.palette.mode === 'light' ? 
+                  (activeTab === 'all' ? '#EDE7F6' : 
+                   activeTab === 'game1' ? '#FFF3E0' : 
+                   activeTab === 'game2' ? '#E1F5FE' : 
+                   activeTab === 'game3' ? '#FFEBEE' : '#E8F5E9') : '#333',
+              }}>
+                <TableCell sx={{ 
+                  fontWeight: 'bold', 
+                  fontSize: '1rem',
+                  position: 'sticky', 
+                  left: 0, 
+                  backgroundColor: theme.palette.mode === 'light' ? 
+                    (activeTab === 'all' ? '#EDE7F6' : 
+                     activeTab === 'game1' ? '#FFF3E0' : 
+                     activeTab === 'game2' ? '#E1F5FE' : 
+                     activeTab === 'game3' ? '#FFEBEE' : '#E8F5E9') : '#333',
+                  zIndex: 1,
+                }}>
+                  Category
+                </TableCell>
                 {detailedScores.houses.map((house) => (
                   <TableCell key={house.id} align="center">
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                       <Avatar 
                         src={house.logo} 
                         alt={house.name} 
-                        sx={{ width: 30, height: 30, mb: 1 }}
+                        sx={{ 
+                          width: 36, 
+                          height: 36, 
+                          mb: 1,
+                          border: `2px solid ${house.color}`,
+                        }}
                       />
-                      {house.name}
+                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
+                        {house.name}
+                      </Typography>
                     </Box>
                   </TableCell>
                 ))}
               </TableRow>
             </TableHead>
             <TableBody>
-              {detailedScores.categories.map((category) => (
+              {gameCategories[activeTab].map((category) => (
                 <TableRow 
                   key={category.id}
                   sx={{ 
@@ -142,10 +284,28 @@ const DetailedScoreTable = () => {
                     },
                     '&:hover': {
                       backgroundColor: theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.07)' : 'rgba(255, 255, 255, 0.1)'
-                    }
+                    },
                   }}
                 >
-                  <TableCell component="th" scope="row">
+                  <TableCell 
+                    component="th" 
+                    scope="row"
+                    sx={{ 
+                      position: 'sticky', 
+                      left: 0, 
+                      backgroundColor: theme.palette.mode === 'light' ? 
+                        'rgba(255, 255, 255, 0.95)' : 
+                        'rgba(18, 18, 18, 0.95)',
+                      zIndex: 1,
+                      borderLeft: `4px solid ${
+                        category.id.includes('bet_your_brain') ? '#FF9800' : 
+                        category.id.includes('tt_') ? '#2196F3' : 
+                        category.id.includes('carrom_') ? '#F44336' : 
+                        '#4CAF50'
+                      }`,
+                      paddingLeft: '16px',
+                    }}
+                  >
                     {category.name}
                   </TableCell>
                   {detailedScores.houses.map((house) => (
@@ -154,31 +314,98 @@ const DetailedScoreTable = () => {
                       align="center"
                       sx={{ 
                         fontWeight: house.points[category.id] > 0 ? 'bold' : 'normal',
-                        color: house.points[category.id] > 0 ? theme.palette.primary.main : theme.palette.text.secondary
+                        fontSize: house.points[category.id] > 50 ? '1rem' : '0.875rem',
+                        color: house.points[category.id] > 0 ? 
+                          (house.points[category.id] >= 100 ? '#4CAF50' :
+                           house.points[category.id] >= 50 ? house.color :
+                           theme.palette.mode === 'light' ? '#333' : '#fff') : 
+                          theme.palette.text.secondary,
+                        padding: '14px 16px',
                       }}
                     >
-                      {house.points[category.id]}
+                      {house.points[category.id] > 0 ? (
+                        <Box sx={{
+                          display: 'inline-block',
+                          minWidth: '40px',
+                          padding: house.points[category.id] >= 50 ? '4px 8px' : '2px 6px',
+                          borderRadius: '4px',
+                          backgroundColor: house.points[category.id] >= 100 ? 
+                            'rgba(76, 175, 80, 0.15)' : 
+                            house.points[category.id] >= 50 ? 
+                              `${house.color}22` : 'transparent',
+                        }}>
+                          {house.points[category.id]}
+                        </Box>
+                      ) : (
+                        '–'
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))}
-              <TableRow sx={{ backgroundColor: theme.palette.mode === 'light' ? '#e3f2fd' : '#102027', fontWeight: 'bold' }}>
-                <TableCell component="th" scope="row" sx={{ fontWeight: 'bold' }}>
+              <TableRow sx={{ 
+                backgroundColor: theme.palette.mode === 'light' ? 
+                  (activeTab === 'all' ? '#EDE7F6' : 
+                   activeTab === 'game1' ? '#FFF3E0' : 
+                   activeTab === 'game2' ? '#E1F5FE' : 
+                   activeTab === 'game3' ? '#FFEBEE' : '#E8F5E9') : '#102027',
+                fontWeight: 'bold',
+              }}>
+                <TableCell 
+                  component="th" 
+                  scope="row" 
+                  sx={{ 
+                    fontWeight: 'bold',
+                    position: 'sticky', 
+                    left: 0, 
+                    backgroundColor: theme.palette.mode === 'light' ? 
+                      (activeTab === 'all' ? '#EDE7F6' : 
+                       activeTab === 'game1' ? '#FFF3E0' : 
+                       activeTab === 'game2' ? '#E1F5FE' : 
+                       activeTab === 'game3' ? '#FFEBEE' : '#E8F5E9') : '#102027',
+                    zIndex: 1,
+                  }}
+                >
                   TOTAL
                 </TableCell>
-                {detailedScores.houses.map((house) => (
-                  <TableCell 
-                    key={`${house.id}-total`} 
-                    align="center"
-                    sx={{ 
-                      fontWeight: 'bold',
-                      fontSize: '1.1rem',
-                      color: theme.palette.mode === 'light' ? '#0d47a1' : '#90caf9'
-                    }}
-                  >
-                    {house.totalPoints}
-                  </TableCell>
-                ))}
+                {detailedScores.houses.map((house) => {
+                  // Calculate subtotal based on active tab
+                  let subtotal;
+                  if (activeTab === 'all') {
+                    subtotal = house.totalPoints;
+                  } else {
+                    const relevantCategories = gameCategories[activeTab];
+                    subtotal = relevantCategories.reduce((sum, category) => 
+                      sum + (house.points[category.id] || 0), 0);
+                  }
+                  
+                  return (
+                    <TableCell 
+                      key={`${house.id}-${activeTab}-total`} 
+                      align="center"
+                      sx={{ 
+                        fontWeight: 'bold',
+                        fontSize: '1.2rem',
+                        color: house.color,
+                        padding: '16px',
+                      }}
+                    >
+                      <Box sx={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        minWidth: '60px',
+                        height: '36px',
+                        border: `2px solid ${house.color}`,
+                        borderRadius: '18px',
+                        backgroundColor: `${house.color}22`,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                      }}>
+                        {subtotal}
+                      </Box>
+                    </TableCell>
+                  );
+                })}
               </TableRow>
             </TableBody>
           </Table>

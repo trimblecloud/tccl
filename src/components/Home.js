@@ -4,17 +4,26 @@ import {
   Paper, Typography, Grid, List, ListItem, ListItemText, Box, 
   Avatar, useTheme, Divider, CircularProgress, Button, 
   Table, TableBody, TableCell, TableContainer, TableHead, 
-  TableRow, Collapse, IconButton
+  TableRow, Collapse, IconButton, Badge
 } from '@mui/material';
 import { db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { motion } from 'framer-motion';
-import { KeyboardArrowDown, KeyboardArrowUp, EmojiEvents } from '@mui/icons-material';
+import { 
+  KeyboardArrowDown, 
+  KeyboardArrowUp, 
+  EmojiEvents,
+  EmojiEventsOutlined,
+  Looks1 as OneIcon,
+  Looks2 as TwoIcon,
+  Looks3 as ThreeIcon 
+} from '@mui/icons-material';
 
 // Import your house logos here
 import yellowSparksLogo from './logo/yellow-sparks-logo.png';
 import spartaLogo from './logo/sparta-logo.png';
 import missionFunPossibleLogo from './logo/mission-fun-possible-logo.png';
+import tcclLogo from '../components/logo/trimble-cloud-championship-league-logo.png';
 
 // Detailed scores data - structured for extensibility
 const detailedScores = {
@@ -31,9 +40,17 @@ const detailedScores = {
     { id: "carrom_r1_participation", name: "Game 3 - Carrom - Round 1 Participation" },
     { id: "carrom_r2_participation", name: "Game 3 - Carrom - Round 2 Participation" },
     { id: "carrom_r3_participation", name: "Game 3 - Carrom - Round 3 Participation" },
-    { id: "carrom_semi_finals", name: "Game 3 - Carrom - Semi Finals" },
+    { id: "carrom_semi_participation", name: "Game 3 - Carrom - Semi Final Participation" },
     { id: "carrom_runners", name: "Game 3 - Carrom - Runners" },
     { id: "carrom_winners", name: "Game 3 - Carrom - Winners" },
+    { id: "chess_r1_participation", name: "Game 4 - Chess - Round 1 Participation" },
+    { id: "chess_r2_participation", name: "Game 4 - Chess - Round 2 Participation" },
+    { id: "chess_r3_participation", name: "Game 4 - Chess - Round 3 Participation" },
+    { id: "chess_r4_participation", name: "Game 4 - Chess - Round 4 Participation" },
+    { id: "chess_semi_participation", name: "Game 4 - Chess - Semi Final Participation" },
+    { id: "chess_runners", name: "Game 4 - Chess - Runners" },
+    { id: "chess_winners", name: "Game 4 - Chess - Winners" },
+    { id: "cards_tower", name: "Cards Tower" },
     // Add new categories here
   ],
   houses: [
@@ -55,9 +72,17 @@ const detailedScores = {
         "carrom_r1_participation": 30,
         "carrom_r2_participation": 40,
         "carrom_r3_participation": 30,
-        "carrom_semi_finals": 80,
+        "carrom_semi_participation": 80,
         "carrom_runners": 70,
         "carrom_winners": 0,
+        "chess_r1_participation": 40,
+        "chess_r2_participation": 100,
+        "chess_r3_participation": 60,
+        "chess_r4_participation": 0,
+        "chess_semi_participation": 0,
+        "chess_runners": 0,
+        "chess_winners": 0,
+        "cards_tower": 0,
       }
     },
     { 
@@ -78,9 +103,17 @@ const detailedScores = {
         "carrom_r1_participation": 30,
         "carrom_r2_participation": 60,
         "carrom_r3_participation": 30,
-        "carrom_semi_finals": 0,
+        "carrom_semi_participation": 0,
         "carrom_runners": 0,
         "carrom_winners": 0,
+        "chess_r1_participation": 20,
+        "chess_r2_participation": 120,
+        "chess_r3_participation": 120,
+        "chess_r4_participation": 120,
+        "chess_semi_participation": 50,
+        "chess_runners": 80,
+        "chess_winners": 120,
+        "cards_tower": 100,
       }
     },
     { 
@@ -101,9 +134,17 @@ const detailedScores = {
         "carrom_r1_participation": 10,
         "carrom_r2_participation": 60,
         "carrom_r3_participation": 60,
-        "carrom_semi_finals": 0,
+        "carrom_semi_participation": 0,
         "carrom_runners": 0,
         "carrom_winners": 100,
+        "chess_r1_participation": 70,
+        "chess_r2_participation": 60,
+        "chess_r3_participation": 60,
+        "chess_r4_participation": 40,
+        "chess_semi_participation": 50,
+        "chess_runners": 0,
+        "chess_winners": 0,
+        "cards_tower": 50,
       }
     },
   ]
@@ -118,22 +159,22 @@ const DetailedScoreTable = () => {
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   const theme = useTheme();
-  
-  // Group categories by game
+    // Group categories by game
   const gameCategories = {
     'all': detailedScores.categories,
-    'general': detailedScores.categories.filter(cat => cat.id.includes('house_details')),
+    'general': detailedScores.categories.filter(cat => cat.id.includes('house_details') || cat.id === 'cards_tower'),
     'game1': detailedScores.categories.filter(cat => cat.id.includes('bet_your_brain')),
     'game2': detailedScores.categories.filter(cat => cat.id.includes('tt_')),
     'game3': detailedScores.categories.filter(cat => cat.id.includes('carrom_')),
+    'game4': detailedScores.categories.filter(cat => cat.id.includes('chess_')),
   };
-  
-  const gameLabels = {
+    const gameLabels = {
     'all': 'All Events',
     'general': 'General',
     'game1': 'Bet Your Brain',
     'game2': 'Table Tennis Doubles',
     'game3': 'Carrom',
+    'game4': 'Chess',
   };
   
   return (
@@ -189,18 +230,19 @@ const DetailedScoreTable = () => {
                 onClick={() => setActiveTab(tab)}
                 sx={{
                   borderRadius: '20px',
-                  minWidth: '80px',
-                  backgroundColor: activeTab === tab ? 
+                  minWidth: '80px',                  backgroundColor: activeTab === tab ? 
                     (tab === 'all' ? '#673AB7' : 
                      tab === 'game1' ? '#FF9800' : 
                      tab === 'game2' ? '#2196F3' : 
-                     tab === 'game3' ? '#F44336' : '#4CAF50') : 'transparent',
+                     tab === 'game3' ? '#F44336' : 
+                     tab === 'game4' ? '#4CAF50' : '#9C27B0') : 'transparent',
                   '&:hover': {
                     backgroundColor: activeTab === tab ? 
                       (tab === 'all' ? '#5E35B1' : 
                        tab === 'game1' ? '#FB8C00' : 
                        tab === 'game2' ? '#1E88E5' : 
-                       tab === 'game3' ? '#E53935' : '#43A047') : 'rgba(0,0,0,0.04)'
+                       tab === 'game3' ? '#E53935' : 
+                       tab === 'game4' ? '#43A047' : '#8E24AA') : 'rgba(0,0,0,0.04)'
                   },
                   color: activeTab === tab ? '#fff' : theme.palette.text.primary,
                   textTransform: 'none',
@@ -296,12 +338,13 @@ const DetailedScoreTable = () => {
                       backgroundColor: theme.palette.mode === 'light' ? 
                         'rgba(255, 255, 255, 0.95)' : 
                         'rgba(18, 18, 18, 0.95)',
-                      zIndex: 1,
-                      borderLeft: `4px solid ${
+                      zIndex: 1,                      borderLeft: `4px solid ${
                         category.id.includes('bet_your_brain') ? '#FF9800' : 
                         category.id.includes('tt_') ? '#2196F3' : 
                         category.id.includes('carrom_') ? '#F44336' : 
-                        '#4CAF50'
+                        category.id.includes('chess_') ? '#4CAF50' :
+                        category.id.includes('cards_tower') ? '#9C27B0' :
+                        '#757575'
                       }`,
                       paddingLeft: '16px',
                     }}
@@ -367,18 +410,17 @@ const DetailedScoreTable = () => {
                   }}
                 >
                   TOTAL
-                </TableCell>
-                {detailedScores.houses.map((house) => {
+                </TableCell>                {detailedScores.houses.map((house) => {
                   // Calculate subtotal based on active tab
                   let subtotal;
                   if (activeTab === 'all') {
-                    subtotal = house.totalPoints;
+                    // For total of all categories, sum up all points
+                    subtotal = Object.values(house.points).reduce((sum, points) => sum + points, 0);
                   } else {
                     const relevantCategories = gameCategories[activeTab];
                     subtotal = relevantCategories.reduce((sum, category) => 
                       sum + (house.points[category.id] || 0), 0);
                   }
-                  
                   return (
                     <TableCell 
                       key={`${house.id}-${activeTab}-total`} 

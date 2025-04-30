@@ -41,6 +41,18 @@ import praneshKPhoto from './images/participants/participant_pranesh_k.jpg';
 import madhanBabuSPhoto from './images/participants/participant_madhan_babu_s.jpg';
 import karthikKPhoto from './images/participants/participant_karthik_k.jpg';
 
+// Import participant photos - Chess
+import josephDanielPhoto from './images/participants/participant_joseph_daniel_raj_ignaci.jpg';
+import ranjithbabuDarumanPhoto from './images/participants/participant_ranjithbabu_daruman.jpg';
+
+// Import participant photos - Card Tower
+import infantShinyPhoto from './images/participants/participant_infant_shiny_a.jpg';
+import keerthanaDhandapaniPhoto from './images/participants/participant_keerthana_dhandapani.jpg';
+import gowsalyaRamasamyPhoto from './images/participants/participant_gowsalya_ramasamy.jpg';
+import snehaThangaveluPhoto from './images/participants/participant_sneha_thangavelu.jpg';
+import miruthuvikasiniSPhoto from './images/participants/participant_miruthuvikasini_s.jpg';
+import meghnaSathyaMoorthyPhoto from './images/participants/participant_meghna_sathya_moorthy.jpg';
+
 // Styled components
 const EventCard = styled(Card)(({ theme, color }) => ({
   marginBottom: '24px',
@@ -76,20 +88,7 @@ const TeamCard = styled(Paper)(({ theme, houseColor }) => ({
   display: 'flex',
   flexDirection: 'column',
   borderTop: `4px solid ${houseColor}`,
-  position: 'relative',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: '10px',
-    right: '10px',
-    width: '40px',
-    height: '40px',
-    opacity: '0.15',
-    backgroundSize: 'contain',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-    zIndex: 0,
-  }
+  position: 'relative'
 }));
 
 // We no longer need this styled component as we're using inline styles directly
@@ -130,9 +129,50 @@ const Winners = () => {
       logo: missionFunPossibleLogo,
       color: '#4C70FF',
     }
-  };
-  // Winners data for each event
+  };  // Winners data for each event
   const eventsData = [
+    {
+      id: 'chess',
+      name: 'Chess',
+      icon: <SportsEsportsIcon />,
+      colors: ['#4CAF50', '#388E3C'],
+      description: 'Classic strategy board game with tournament format',
+      winners: {
+        house: 'house2',
+        members: [
+          { name: 'Joseph Daniel Raj Ignaci', photo: josephDanielPhoto }
+        ]
+      },
+      runners: {
+        house: 'house2',
+        members: [
+          { name: 'RanjithBabu Daruman', photo: ranjithbabuDarumanPhoto }
+        ]
+      }
+    },
+    {
+      id: 'card-tower',
+      name: 'Card Tower',
+      icon: <EmojiEventsIcon />,
+      colors: ['#9C27B0', '#7B1FA2'],
+      description: 'Team competition to build the highest and most creative card tower',
+      winners: {
+        house: 'house2',
+        members: [
+          { name: 'Infant Shiny A', photo: infantShinyPhoto },
+          { name: 'Keerthana Dhandapani', photo: keerthanaDhandapaniPhoto },
+          { name: 'Gowsalya Ramasamy', photo: gowsalyaRamasamyPhoto }
+        ]
+      },
+      runners: {
+        house: 'house3',
+        members: [
+          { name: 'Sneha Thangavelu', photo: snehaThangaveluPhoto },
+          { name: 'Miruthuvikasini S', photo: miruthuvikasiniSPhoto },
+          { name: 'Meghna Sathya Moorthy', photo: meghnaSathyaMoorthyPhoto }
+        ]
+      }
+    },
     {
       id: 'bet-your-brain',
       name: 'Bet Your Brain',

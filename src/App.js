@@ -34,7 +34,8 @@ import {
   Games as GameIcon,
   Close as CloseIcon,
   PhotoLibrary as PhotoLibraryIcon,
-  EmojiEvents as EmojiEventsIcon
+  EmojiEvents as EmojiEventsIcon,
+  Assessment as ViewListIcon
 } from '@mui/icons-material';
 import Home from './components/Home';
 import Events from './components/Events';
@@ -43,6 +44,7 @@ import GuessGame from './components/GuessGame';
 import Fixtures from './components/Fixtures';
 import Gallery from './components/Gallery';
 import Winners from './components/Winners';
+import Scores from './components/Scores';
 import logo from './components/logo/trimble-cloud-championship-league-logo.png';
 
 // Navigation menu items definition
@@ -51,6 +53,7 @@ const menuItems = [
   { label: 'Events', path: '/events', icon: <EventIcon /> },
   { label: 'Fixtures', path: '/fixtures', icon: <FixturesIcon /> },
   { label: 'Winners', path: '/winners', icon: <EmojiEventsIcon /> },
+  { label: 'Scores', path: '/scores', icon: <ViewListIcon /> },
   { label: 'House Members', path: '/participants', icon: <PeopleIcon /> },
   { label: 'Guess Game', path: '/guessgame', icon: <GameIcon /> },
   { label: 'Gallery', path: '/gallery', icon: <PhotoLibraryIcon /> },
@@ -128,7 +131,7 @@ function App() {
           MuiAppBar: {
             styleOverrides: {
               root: {
-                backgroundColor: mode === 'light' ? '#FFCF50' : 'rgba(30, 30, 30, 0.7)',
+                backgroundColor: mode === 'light' ? '#43cea2' : 'rgba(30, 30, 30, 0.7)',
                 boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)',
               },
             },
@@ -302,6 +305,7 @@ function App() {
             <Route path="/events" element={<Events />} />
             <Route path="/fixtures" element={<Fixtures />} />
             <Route path="/winners" element={<Winners />} />
+            <Route path="/scores" element={<Scores />} />
             <Route path="/participants" element={<Participants />} />
             <Route path="/guessgame" element={<GuessGame />} />
             <Route path="/gallery" element={<Gallery />} />
@@ -311,7 +315,7 @@ function App() {
         <Box
           component="footer"
           sx={{
-            backgroundColor: mode === 'light' ? '#FFCF50' : 'rgba(30, 30, 30, 0.7)',
+            backgroundColor: mode === 'light' ? '#43cea2' : 'rgba(30, 30, 30, 0.7)',
             color: theme.palette.text.primary,
             padding: '16px',
             marginTop: '20px',

@@ -26,7 +26,9 @@ import {
   PhotoLibrary as PhotoIcon,
   EmojiEvents as EventIcon,
   Apps as AppsIcon,
-  CollectionsRounded
+  CollectionsRounded,
+  Casino as ChessIcon,
+  Architecture as CardsTowerIcon
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import yellowSparksLogo from './logo/yellow-sparks-logo.png';
@@ -94,20 +96,30 @@ const events = [
       count: 0, // Will be set dynamically
       color: 'secondary'
     }
+  },  {
+    id: 'chess',
+    name: 'Chess',
+    description: 'Strategic battles from our Chess tournament showcasing skills and concentration',
+    icon: <ChessIcon />,
+    images: importAll(require.context('./gallery/chess', false, /\.(png|jpe?g|JPG|svg)$/)),
+    date: 'April 26-28, 2025',
+    badge: {
+      count: 0, // Will be set dynamically
+      color: 'success'
+    }
+  },
+  {
+    id: 'cardstower',
+    name: 'Cards Tower',
+    description: 'Creative card tower building competition testing patience and precision',
+    icon: <CardsTowerIcon />,
+    images: importAll(require.context('./gallery/cardstower', false, /\.(png|jpe?g|JPG|svg)$/)),
+    date: 'April 30, 2025',
+    badge: {
+      count: 0, // Will be set dynamically
+      color: 'info'
+    }
   }
-  // Example for adding more events:
-  // {
-  //   id: 'cricket',
-  //   name: 'Cricket Tournament',
-  //   description: 'Images from our Cricket matches',
-  //   icon: <EventIcon />,
-  //   images: [], // Will be populated when you add images
-  //   date: 'May 10, 2025',
-  //   badge: {
-  //     count: 0,
-  //     color: 'success'
-  //   }
-  // }
 ];
 
 // Set image count for badges

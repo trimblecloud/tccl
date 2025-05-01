@@ -2,465 +2,69 @@
 import React, { useEffect, useState } from 'react';
 import { 
   Paper, Typography, Grid, List, ListItem, ListItemText, Box, 
-  Avatar, useTheme, Divider, CircularProgress, Button, 
-  Table, TableBody, TableCell, TableContainer, TableHead, 
-  TableRow, Collapse, IconButton, Badge
+  Avatar, useTheme, Divider, CircularProgress, Button,
+  Badge
 } from '@mui/material';
+import { Link } from 'react-router-dom';
 import { db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { motion } from 'framer-motion';
 import { 
-  KeyboardArrowDown, 
-  KeyboardArrowUp, 
   EmojiEvents,
   EmojiEventsOutlined,
-  Looks1 as OneIcon,
-  Looks2 as TwoIcon,
-  Looks3 as ThreeIcon 
+  LooksOne as OneIcon,
+  LooksTwo as TwoIcon,
+  Looks3 as ThreeIcon,
+  MoreHoriz as MoreHorizIcon
 } from '@mui/icons-material';
+
+// Import DetailedScores component
+import DetailedScores from './DetailedScores';
 
 // Import your house logos here
 import yellowSparksLogo from './logo/yellow-sparks-logo.png';
 import spartaLogo from './logo/sparta-logo.png';
 import missionFunPossibleLogo from './logo/mission-fun-possible-logo.png';
-import tcclLogo from '../components/logo/trimble-cloud-championship-league-logo.png';
-
-// Detailed scores data - structured for extensibility
-const detailedScores = {
-  categories: [
-    { id: "house_details", name: "House Details Submission" },
-    { id: "bet_your_brain_submission", name: "Game 1 - Bet Your Brain Participants Submission" },
-    { id: "bet_your_brain", name: "Game 1 - Bet Your Brain" },
-    { id: "tt_group_participation", name: "Game 2 - TT Doubles - Group Stage Participation" },
-    { id: "tt_group_runners", name: "Game 2 - TT Doubles - Group Stage Runners" },
-    { id: "tt_semis_participation", name: "Game 2 - TT Doubles - Semis Participation" },
-    { id: "tt_semis_runners", name: "Game 2 - TT Doubles - Semis Runners" },
-    { id: "tt_runners", name: "Game 2 - TT Doubles - Runners" },
-    { id: "tt_winners", name: "Game 2 - TT Doubles - Winners" },
-    { id: "carrom_r1_participation", name: "Game 3 - Carrom - Round 1 Participation" },
-    { id: "carrom_r2_participation", name: "Game 3 - Carrom - Round 2 Participation" },
-    { id: "carrom_r3_participation", name: "Game 3 - Carrom - Round 3 Participation" },
-    { id: "carrom_semi_participation", name: "Game 3 - Carrom - Semi Final Participation" },
-    { id: "carrom_runners", name: "Game 3 - Carrom - Runners" },
-    { id: "carrom_winners", name: "Game 3 - Carrom - Winners" },
-    { id: "chess_r1_participation", name: "Game 4 - Chess - Round 1 Participation" },
-    { id: "chess_r2_participation", name: "Game 4 - Chess - Round 2 Participation" },
-    { id: "chess_r3_participation", name: "Game 4 - Chess - Round 3 Participation" },
-    { id: "chess_r4_participation", name: "Game 4 - Chess - Round 4 Participation" },
-    { id: "chess_semi_participation", name: "Game 4 - Chess - Semi Final Participation" },
-    { id: "chess_runners", name: "Game 4 - Chess - Runners" },
-    { id: "chess_winners", name: "Game 4 - Chess - Winners" },
-    { id: "cards_tower", name: "Cards Tower" },
-    // Add new categories here
-  ],
-  houses: [
-    { 
-      id: "yellow_sparks", 
-      name: "The Yellow Sparks", 
-      logo: yellowSparksLogo,
-      color: "#FFD600",
-      points: {
-        "house_details": 0,
-        "bet_your_brain_submission": 10,
-        "bet_your_brain": 100,
-        "tt_group_participation": 10,
-        "tt_group_runners": 20,
-        "tt_semis_participation": 30,
-        "tt_semis_runners": 80,
-        "tt_runners": 0,
-        "tt_winners": 0,
-        "carrom_r1_participation": 30,
-        "carrom_r2_participation": 40,
-        "carrom_r3_participation": 30,
-        "carrom_semi_participation": 80,
-        "carrom_runners": 70,
-        "carrom_winners": 0,
-        "chess_r1_participation": 40,
-        "chess_r2_participation": 100,
-        "chess_r3_participation": 60,
-        "chess_r4_participation": 0,
-        "chess_semi_participation": 0,
-        "chess_runners": 0,
-        "chess_winners": 0,
-        "cards_tower": 0,
-      }
-    },
-    { 
-      id: "sparta", 
-      name: "Sparta", 
-      logo: spartaLogo,
-      color: "#F44336",
-      points: {
-        "house_details": 5,
-        "bet_your_brain_submission": 5,
-        "bet_your_brain": 0,
-        "tt_group_participation": 30,
-        "tt_group_runners": 20,
-        "tt_semis_participation": 0,
-        "tt_semis_runners": 0,
-        "tt_runners": 70,
-        "tt_winners": 100,
-        "carrom_r1_participation": 30,
-        "carrom_r2_participation": 60,
-        "carrom_r3_participation": 30,
-        "carrom_semi_participation": 0,
-        "carrom_runners": 0,
-        "carrom_winners": 0,
-        "chess_r1_participation": 20,
-        "chess_r2_participation": 120,
-        "chess_r3_participation": 120,
-        "chess_r4_participation": 120,
-        "chess_semi_participation": 50,
-        "chess_runners": 80,
-        "chess_winners": 120,
-        "cards_tower": 100,
-      }
-    },
-    { 
-      id: "mission_funpossible", 
-      name: "Mission FunPossible", 
-      logo: missionFunPossibleLogo,
-      color: "#2196F3",
-      points: {
-        "house_details": 0,
-        "bet_your_brain_submission": 0,
-        "bet_your_brain": 50,
-        "tt_group_participation": 20,
-        "tt_group_runners": 80,
-        "tt_semis_participation": 30,
-        "tt_semis_runners": 0,
-        "tt_runners": 0,
-        "tt_winners": 0,  
-        "carrom_r1_participation": 10,
-        "carrom_r2_participation": 60,
-        "carrom_r3_participation": 60,
-        "carrom_semi_participation": 0,
-        "carrom_runners": 0,
-        "carrom_winners": 100,
-        "chess_r1_participation": 70,
-        "chess_r2_participation": 60,
-        "chess_r3_participation": 60,
-        "chess_r4_participation": 40,
-        "chess_semi_participation": 50,
-        "chess_runners": 0,
-        "chess_winners": 0,
-        "cards_tower": 50,
-      }
-    },
-  ]
-};
-
-// Calculate total points for each house
-detailedScores.houses.forEach(house => {
-  house.totalPoints = Object.values(house.points).reduce((sum, points) => sum + points, 0);
-});
-
-const DetailedScoreTable = () => {
-  const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('all');
-  const theme = useTheme();
-    // Group categories by game
-  const gameCategories = {
-    'all': detailedScores.categories,
-    'general': detailedScores.categories.filter(cat => cat.id.includes('house_details') || cat.id === 'cards_tower'),
-    'game1': detailedScores.categories.filter(cat => cat.id.includes('bet_your_brain')),
-    'game2': detailedScores.categories.filter(cat => cat.id.includes('tt_')),
-    'game3': detailedScores.categories.filter(cat => cat.id.includes('carrom_')),
-    'game4': detailedScores.categories.filter(cat => cat.id.includes('chess_')),
-  };
-    const gameLabels = {
-    'all': 'All Events',
-    'general': 'General',
-    'game1': 'Bet Your Brain',
-    'game2': 'Table Tennis Doubles',
-    'game3': 'Carrom',
-    'game4': 'Chess',
-  };
-  
-  return (
-    <Box sx={{ width: '100%', mb: 4 }}>
-      <Button 
-        variant="contained" 
-        onClick={() => setOpen(!open)}
-        startIcon={<EmojiEvents />}
-        endIcon={open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-        sx={{
-          mb: 2,
-          backgroundImage: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)',
-          borderRadius: '12px',
-          padding: '10px 20px',
-          transition: 'all 0.2s ease',
-          '&:hover': {
-            backgroundImage: 'linear-gradient(135deg, #F57C00 0%, #E65100 100%)',
-            transform: 'translateY(-2px)',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-          }
-        }}
-      >
-        {open ? "Hide Detailed Scores" : "View Detailed Scores"}
-      </Button>
-      
-      <Collapse in={open} timeout="auto" unmountOnExit>
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 2,
-          flexDirection: {xs: 'column', sm: 'row'},
-          gap: 2
-        }}>
-          <Typography variant="body1" gutterBottom sx={{ mb: {xs: 0, sm: 0}, fontWeight: 'medium' }}>
-            <span style={{ backgroundColor: '#4CAF50', color: 'white', padding: '3px 8px', borderRadius: '4px', marginRight: '8px' }}>
-              Updated
-            </span>
-            April 25, 2025
-          </Typography>
-          
-          <Box sx={{ 
-            display: 'flex', 
-            gap: 1, 
-            flexWrap: 'wrap',
-            justifyContent: {xs: 'center', sm: 'flex-end'}
-          }}>
-            {Object.keys(gameLabels).map(tab => (
-              <Button
-                key={tab}
-                variant={activeTab === tab ? "contained" : "outlined"}
-                size="small"
-                onClick={() => setActiveTab(tab)}
-                sx={{
-                  borderRadius: '20px',
-                  minWidth: '80px',                  backgroundColor: activeTab === tab ? 
-                    (tab === 'all' ? '#673AB7' : 
-                     tab === 'game1' ? '#FF9800' : 
-                     tab === 'game2' ? '#2196F3' : 
-                     tab === 'game3' ? '#F44336' : 
-                     tab === 'game4' ? '#4CAF50' : '#9C27B0') : 'transparent',
-                  '&:hover': {
-                    backgroundColor: activeTab === tab ? 
-                      (tab === 'all' ? '#5E35B1' : 
-                       tab === 'game1' ? '#FB8C00' : 
-                       tab === 'game2' ? '#1E88E5' : 
-                       tab === 'game3' ? '#E53935' : 
-                       tab === 'game4' ? '#43A047' : '#8E24AA') : 'rgba(0,0,0,0.04)'
-                  },
-                  color: activeTab === tab ? '#fff' : theme.palette.text.primary,
-                  textTransform: 'none',
-                }}
-              >
-                {gameLabels[tab]}
-              </Button>
-            ))}
-          </Box>
-        </Box>
-        
-        <TableContainer 
-          component={Paper} 
-          elevation={4} 
-          sx={{ 
-            overflow: 'auto', 
-            borderRadius: '16px',
-            '&::-webkit-scrollbar': {
-              height: '8px',
-            },
-            '&::-webkit-scrollbar-track': {
-              backgroundColor: theme.palette.mode === 'light' ? '#f1f1f1' : '#333',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              backgroundColor: theme.palette.mode === 'light' ? '#888' : '#555',
-              borderRadius: '4px',
-            }
-          }}
-        >
-          <Table aria-label="detailed scores table">
-            <TableHead>
-              <TableRow sx={{ 
-                backgroundColor: theme.palette.mode === 'light' ? 
-                  (activeTab === 'all' ? '#EDE7F6' : 
-                   activeTab === 'game1' ? '#FFF3E0' : 
-                   activeTab === 'game2' ? '#E1F5FE' : 
-                   activeTab === 'game3' ? '#FFEBEE' : '#E8F5E9') : '#333',
-              }}>
-                <TableCell sx={{ 
-                  fontWeight: 'bold', 
-                  fontSize: '1rem',
-                  position: 'sticky', 
-                  left: 0, 
-                  backgroundColor: theme.palette.mode === 'light' ? 
-                    (activeTab === 'all' ? '#EDE7F6' : 
-                     activeTab === 'game1' ? '#FFF3E0' : 
-                     activeTab === 'game2' ? '#E1F5FE' : 
-                     activeTab === 'game3' ? '#FFEBEE' : '#E8F5E9') : '#333',
-                  zIndex: 1,
-                }}>
-                  Category
-                </TableCell>
-                {detailedScores.houses.map((house) => (
-                  <TableCell key={house.id} align="center">
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <Avatar 
-                        src={house.logo} 
-                        alt={house.name} 
-                        sx={{ 
-                          width: 36, 
-                          height: 36, 
-                          mb: 1,
-                          border: `2px solid ${house.color}`,
-                        }}
-                      />
-                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
-                        {house.name}
-                      </Typography>
-                    </Box>
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {gameCategories[activeTab].map((category) => (
-                <TableRow 
-                  key={category.id}
-                  sx={{ 
-                    '&:nth-of-type(odd)': { 
-                      backgroundColor: theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.03)' : 'rgba(255, 255, 255, 0.05)' 
-                    },
-                    '&:hover': {
-                      backgroundColor: theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.07)' : 'rgba(255, 255, 255, 0.1)'
-                    },
-                  }}
-                >
-                  <TableCell 
-                    component="th" 
-                    scope="row"
-                    sx={{ 
-                      position: 'sticky', 
-                      left: 0, 
-                      backgroundColor: theme.palette.mode === 'light' ? 
-                        'rgba(255, 255, 255, 0.95)' : 
-                        'rgba(18, 18, 18, 0.95)',
-                      zIndex: 1,                      borderLeft: `4px solid ${
-                        category.id.includes('bet_your_brain') ? '#FF9800' : 
-                        category.id.includes('tt_') ? '#2196F3' : 
-                        category.id.includes('carrom_') ? '#F44336' : 
-                        category.id.includes('chess_') ? '#4CAF50' :
-                        category.id.includes('cards_tower') ? '#9C27B0' :
-                        '#757575'
-                      }`,
-                      paddingLeft: '16px',
-                    }}
-                  >
-                    {category.name}
-                  </TableCell>
-                  {detailedScores.houses.map((house) => (
-                    <TableCell 
-                      key={`${house.id}-${category.id}`} 
-                      align="center"
-                      sx={{ 
-                        fontWeight: house.points[category.id] > 0 ? 'bold' : 'normal',
-                        fontSize: house.points[category.id] > 50 ? '1rem' : '0.875rem',
-                        color: house.points[category.id] > 0 ? 
-                          (house.points[category.id] >= 100 ? '#4CAF50' :
-                           house.points[category.id] >= 50 ? house.color :
-                           theme.palette.mode === 'light' ? '#333' : '#fff') : 
-                          theme.palette.text.secondary,
-                        padding: '14px 16px',
-                      }}
-                    >
-                      {house.points[category.id] > 0 ? (
-                        <Box sx={{
-                          display: 'inline-block',
-                          minWidth: '40px',
-                          padding: house.points[category.id] >= 50 ? '4px 8px' : '2px 6px',
-                          borderRadius: '4px',
-                          backgroundColor: house.points[category.id] >= 100 ? 
-                            'rgba(76, 175, 80, 0.15)' : 
-                            house.points[category.id] >= 50 ? 
-                              `${house.color}22` : 'transparent',
-                        }}>
-                          {house.points[category.id]}
-                        </Box>
-                      ) : (
-                        '–'
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-              <TableRow sx={{ 
-                backgroundColor: theme.palette.mode === 'light' ? 
-                  (activeTab === 'all' ? '#EDE7F6' : 
-                   activeTab === 'game1' ? '#FFF3E0' : 
-                   activeTab === 'game2' ? '#E1F5FE' : 
-                   activeTab === 'game3' ? '#FFEBEE' : '#E8F5E9') : '#102027',
-                fontWeight: 'bold',
-              }}>
-                <TableCell 
-                  component="th" 
-                  scope="row" 
-                  sx={{ 
-                    fontWeight: 'bold',
-                    position: 'sticky', 
-                    left: 0, 
-                    backgroundColor: theme.palette.mode === 'light' ? 
-                      (activeTab === 'all' ? '#EDE7F6' : 
-                       activeTab === 'game1' ? '#FFF3E0' : 
-                       activeTab === 'game2' ? '#E1F5FE' : 
-                       activeTab === 'game3' ? '#FFEBEE' : '#E8F5E9') : '#102027',
-                    zIndex: 1,
-                  }}
-                >
-                  TOTAL
-                </TableCell>                {detailedScores.houses.map((house) => {
-                  // Calculate subtotal based on active tab
-                  let subtotal;
-                  if (activeTab === 'all') {
-                    // For total of all categories, sum up all points
-                    subtotal = Object.values(house.points).reduce((sum, points) => sum + points, 0);
-                  } else {
-                    const relevantCategories = gameCategories[activeTab];
-                    subtotal = relevantCategories.reduce((sum, category) => 
-                      sum + (house.points[category.id] || 0), 0);
-                  }
-                  return (
-                    <TableCell 
-                      key={`${house.id}-${activeTab}-total`} 
-                      align="center"
-                      sx={{ 
-                        fontWeight: 'bold',
-                        fontSize: '1.2rem',
-                        color: house.color,
-                        padding: '16px',
-                      }}
-                    >
-                      <Box sx={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        minWidth: '60px',
-                        height: '36px',
-                        border: `2px solid ${house.color}`,
-                        borderRadius: '18px',
-                        backgroundColor: `${house.color}22`,
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                      }}>
-                        {subtotal}
-                      </Box>
-                    </TableCell>
-                  );
-                })}
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Collapse>
-    </Box>
-  );
-};
+import tcclLogo from './logo/trimble-cloud-championship-league-logo.png';
+import tcclBanner from './logo/tccl-banner.jpg';
+import { light } from '@mui/material/styles/createPalette';
 
 const Home = () => {
   const theme = useTheme();
   const textColor = theme.palette.mode === 'light' ? '#000000' : '#FFFFFF';
   const secondaryTextColor = theme.palette.mode === 'light' ? '#000000' : '#000000'; // Always black for badge text
+  const [openLeadershipInfo, setOpenLeadershipInfo] = useState(null);
+  
+  // Updated captains list with vice captains
+  const teamLeadership = [
+    { 
+      house: 1, 
+      houseName: "The Yellow Sparks", 
+      logo: yellowSparksLogo,
+      leaders: [
+        { name: 'Sweatha S', role: 'Captain' },
+        { name: 'Vikash S R', role: 'Vice Captain' }
+      ]
+    },
+    { 
+      house: 2, 
+      houseName: "Sparta", 
+      logo: spartaLogo,
+      leaders: [
+        { name: 'Harivarthini R', role: 'Captain' },
+        { name: 'Dharani Sanjai B', role: 'Vice Captain' }
+      ]
+    },
+    { 
+      house: 3, 
+      houseName: "Mission FunPossible", 
+      logo: missionFunPossibleLogo,
+      leaders: [
+        { name: 'Vishali Senniappan', role: 'Captain' },
+        { name: 'Pranesh K', role: 'Vice Captain' }
+      ]
+    },
+  ];
   
   const [leaderBoard, setLeaderBoard] = useState(null); // Initially null to indicate loading
   const [loading, setLoading] = useState(true);
@@ -506,227 +110,493 @@ const Home = () => {
   }
 
   // Sort leaderboard by points in descending order
-  const sortedLeaderBoard = leaderBoard.sort((a, b) => b.points - a.points);
-  
-  // Updated captains list with vice captains
-  const teamLeadership = [
-    { 
-      house: 1, 
-      houseName: "The Yellow Sparks", 
-      logo: yellowSparksLogo,
-      leaders: [
-        { name: 'Sweatha S', role: 'Captain' },
-        { name: 'Vikash S R', role: 'Vice Captain' }
-      ]
-    },
-    { 
-      house: 2, 
-      houseName: "Sparta", 
-      logo: spartaLogo,
-      leaders: [
-        { name: 'Harivarthini R', role: 'Captain' },
-        { name: 'Dharani Sanjai B', role: 'Vice Captain' }
-      ]
-    },
-    { 
-      house: 3, 
-      houseName: "Mission FunPossible", 
-      logo: missionFunPossibleLogo,
-      leaders: [
-        { name: 'Vishali Senniappan', role: 'Captain' },
-        { name: 'Pranesh K', role: 'Vice Captain' }
-      ]
-    },
-  ];
-
-  return (
-    <Grid container spacing={2}>
-      <Grid item xs={12}>
+  const sortedLeaderBoard = leaderBoard.sort((a, b) => b.points - a.points);  return (
+    <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <Box
+            sx={{
+          position: 'relative',
+          borderRadius: '16px',
+          overflow: 'hidden',
+          boxShadow: '0px 6px 12px rgba(0, 0, 0, 0.15)',
+          mb: 4,
+          backgroundColor: theme.palette.background.paper,
+          height: { xs: '200px', sm: '250px', md: '300px' },
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+            }}
+          >
+            <Box sx={{ 
+          position: 'absolute', 
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: `url(${tcclBanner})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: 'blur(5px)',
+          transform: 'scale(1.1)', // Prevents blur edges from showing
+            }} />
+            
+            <Box sx={{ 
+          position: 'absolute', 
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          zIndex: 1,
+            }} />
+            
+            <Box sx={{ 
+          position: 'relative', 
+          zIndex: 2, 
+          textAlign: 'center',
+          width: '100%',
+          p: { xs: 2, sm: 4 }
+            }}>
+          <Typography variant="h3" component="h1" sx={{ 
+            fontWeight: 'bold',
+            background: 'linear-gradient(45deg,#43cea2 ,#43cea2)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            fontSize: { xs: '1.8rem', sm: '2.5rem', md: '3rem' }
+          }}>
+            Trimble Cloud Championship League
+          </Typography>
+          <Typography variant="h5" sx={{ 
+            color: theme.palette.mode === 'light'? '#02aab0 ':'#FFFFFF'  ,
+            mb: 3,
+            textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+            fontSize: { xs: '1rem', sm: '1.2rem', md: '1.5rem' }
+          }}>
+            A team building initiative for Trimble Cloud engineering
+          </Typography>
+          <Box 
+            sx={{ 
+              display: 'flex', 
+              gap: 2, 
+              justifyContent: 'center',
+              flexWrap: 'wrap'
+            }}
+          >
+            <Button 
+              component={Link}
+              to="/events"
+              variant="contained" 
+              sx={{ 
+            backgroundColor: '#43cea2',
+            color: '#000',
+            '&:hover': {
+              backgroundColor: '#00cdac',
+            }
+              }}
+            >
+              View Events
+            </Button>
+            <Button 
+              component={Link}
+              to="/winners"
+              variant="contained" 
+              sx={{ 
+            backgroundColor: '#43cea2',
+            color: '#000',
+            '&:hover': {
+              backgroundColor: '#00cdac',
+            }
+              }}
+            >
+              See Winners
+            </Button>
+          </Box>
+            </Box>
+          </Box>
+        </Grid>      {/* Leaderboard Section */}
+      <Grid item xs={12} md={10} lg={8} sx={{ mx: 'auto' }}>
         <Paper
-          elevation={3}
+          elevation={4}
           sx={{
-            padding: '20px',
-            background: 'linear-gradient(135deg, #FFEB3B 0%, #FF9800 100%)',
+            padding: { xs: '16px', sm: '24px' },
+            backgroundColor: theme.palette.background.paper,
             color: textColor,
             borderRadius: '16px',
             boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3)',
+            position: 'relative',
+            overflow: 'hidden',
+            height: '100%',
+            display: 'flex', 
+            flexDirection: 'column'
           }}
         >
-          <Typography variant="h5" gutterBottom>
-            Leaderboard
-          </Typography>
-          <List>
-            {sortedLeaderBoard.map((item) => (
-              <motion.div
-                key={item.house}
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: item.house * 0.2 }}
-              >
-                <ListItem
-                  sx={{
-                    '&:hover': {
-                      transform: 'scale(1.05)',
-                      transition: 'transform 0.3s ease',
-                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                    },
-                  }}
-                >
-                  <Box display="flex" alignItems="center">
-                    <Avatar
-                      src={item.logo}
-                      alt={`${item.houseName} Logo`}
-                      sx={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: '8px',
-                        marginRight: '16px',
-                        boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.5)',
-                      }}
-                    />
-                    <ListItemText
-                      primary={
-                        <Typography color={textColor} variant="body1" fontWeight="medium">
-                          {item.houseName}
-                        </Typography>
-                      }
-                      secondary={
-                        <Box
-                          sx={{
-                            display: 'inline-block',
-                            padding: '4px 8px',
-                            backgroundColor: '#ffffff',
-                            color: secondaryTextColor,
-                            borderRadius: '12px',
-                            fontWeight: 'bold',
-                            boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
-                          }}
-                        >
-                          Points: {item.points}
-                        </Box>
-                      }
-                    />
-                  </Box>
-                </ListItem>
-              </motion.div>
-            ))}
-          </List>
-          <Grid item xs={12}>
-        <DetailedScoreTable />
-      </Grid>
-        </Paper>
-      </Grid>
-      <Grid item xs={12}>
-  <Paper
-    elevation={3}
-    sx={{
-      padding: '20px',
-      background: 'linear-gradient(135deg, #4A148C 0%, #7B1FA2 100%)',
-      color: '#FFFFFF',
-      borderRadius: '16px',
-      boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3)',
-    }}
-  >
-    <Typography variant="h5" gutterBottom sx={{ mb: 3, textAlign: { xs: 'center', md: 'left' } }}>
-      Team Leaders
-    </Typography>
-
-    <Grid container spacing={3}>
-      {teamLeadership.map((team) => (
-        <Grid item xs={12} sm={6} md={4} key={team.house}>
-          <Box
+          {/* Background pattern for visual interest */}
+          <Box 
             sx={{
-              bgcolor: 'rgba(255, 255, 255, 0.1)',
-              borderRadius: '12px',
-              p: 2,
-              pb: 3,
-              display: 'flex',
-              flexDirection: 'column',
-              transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-              '&:hover': {
-                transform: 'translateY(-5px)',
-                bgcolor: 'rgba(255, 255, 255, 0.15)',
-                boxShadow: '0 8px 16px rgba(0,0,0,0.3)',
-              },
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              opacity: 0.03,
+              backgroundImage: `radial-gradient(#000 1px, transparent 1px)`,
+              backgroundSize: '20px 20px',
+              pointerEvents: 'none',
+              zIndex: 0
+            }}
+          />
+          
+          {/* Leaderboard Header with TCCL logo */}
+          <Box 
+            sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'space-between',
+              mb: 2,
+              position: 'relative',
+              pb: 2,
+              borderBottom: '2px solid rgba(0,0,0,0.1)'
             }}
           >
-            <Box
-              display="flex"
-              alignItems="center"
-              mb={1.5}
-              sx={{
-                justifyContent: { xs: 'center', sm: 'flex-start' },
-              }}
-            >
-              <Avatar
-                src={team.logo}
-                alt={`${team.houseName} Logo`}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Avatar 
+                src={tcclLogo} 
+                alt="TCCL Logo"
                 sx={{
-                  width: 40,
-                  height: 40,
+                  width: { xs: 36, sm: 48 },
+                  height: { xs: 36, sm: 48 },
                   borderRadius: '8px',
-                  marginRight: '12px',
-                  boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.5)',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
                 }}
               />
-              <Typography variant="h6" color="#FFFFFF" fontWeight="bold">
-                {team.houseName}
+              <Typography 
+                variant="h5" 
+                sx={{ 
+                  fontWeight: 'bold',
+                  background: 'linear-gradient(45deg,rgb(26, 126, 114),rgb(228, 144, 54))',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  fontSize: { xs: '1.2rem', sm: '1.5rem' }
+                }}
+              >
+                Leaderboard
               </Typography>
             </Box>
+            
+          </Box>
+          
+          {/* Trophy icon decorations */}
+          <Box sx={{ 
+            position: 'absolute', 
+            right: -20, 
+            bottom: -20, 
+            opacity: 0.07, 
+            fontSize: { xs: '80px', sm: '100px', md: '120px' },
+            transform: 'rotate(15deg)',
+            color: theme.palette.mode === 'light' ? '#000' : '#fff',
+            zIndex: 0
+          }}>
+            <EmojiEvents fontSize="inherit" />
+          </Box>
 
-            <Divider sx={{ mb: 2, backgroundColor: 'rgba(255, 255, 255, 0.2)' }} />
-
-            <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly' }}>
-              {team.leaders.map((leader, idx) => (
-                <Box
-                  key={idx}
-                  display="flex"
-                  alignItems="center"
-                  sx={{
-                    mb: idx === 0 ? 2 : 0,
-                    p: 1.5,
-                    borderRadius: '8px',
-                    backgroundColor: leader.role === 'Captain' ? 'rgba(255, 215, 0, 0.15)' : 'transparent',
-                    justifyContent: { xs: 'center', sm: 'flex-start' },
-                    flexDirection: { xs: 'column', sm: 'row' },
-                  }}
-                >
-                  <Box
+          <List sx={{ 
+            position: 'relative', 
+            zIndex: 1, 
+            flexGrow: 1, 
+            overflow: 'auto',
+            '&::-webkit-scrollbar': {
+              width: '4px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: 'transparent',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: '#bbb',
+              borderRadius: '4px',
+            }
+          }}>
+            {sortedLeaderBoard.map((item, index) => {
+              // Get position badge component based on ranking
+              const PositionBadge = () => {
+                const position = index + 1;
+                const colors = {
+                  1: { bg: 'gold', text: theme.palette.mode === 'light' ?'#000' :'#fff'},
+                  2: { bg: 'silver', text: theme.palette.mode === 'light' ?'#000' :'#fff' },
+                  3: { bg: '#CD7F32', text: theme.palette.mode === 'light' ?'#000' :'#fff' } // Bronze
+                };
+                
+                const getRankIcon = (pos) => {
+                  switch(pos) {
+                    case 1: return <OneIcon fontSize="small" />;
+                    case 2: return <TwoIcon fontSize="small" />;
+                    case 3: return <ThreeIcon fontSize="small" />;
+                    default: return pos;
+                  }
+                };
+                
+                return (
+                  <Avatar 
                     sx={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: '50%',
-                      bgcolor: leader.role === 'Captain' ? 'gold' : '#E0E0E0',
-                      color: '#000',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
+                      width: { xs: 30, sm: 36 }, 
+                      height: { xs: 30, sm: 36 }, 
+                      bgcolor: colors[position]?.bg || '#9e9e9e',
+                      color: colors[position]?.text || '#fff',
                       fontWeight: 'bold',
-                      fontSize: '14px',
-                      mr: { xs: 0, sm: 2 },
-                      mb: { xs: 1, sm: 0 },
+                      fontSize: { xs: '0.8rem', sm: '1rem' },
+                      marginRight: { xs: '12px', sm: '16px' },
+                      border: '2px solid #fff',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                      flexShrink: 0
                     }}
                   >
-                    {leader.role === 'Captain' ? 'C' : 'VC'}
-                  </Box>
-                  <Box sx={{ textAlign: { xs: 'center', sm: 'left' } }}>
-                    <Typography color="#FFFFFF" variant="body1" fontWeight="medium">
-                      {leader.name}
-                    </Typography>
-                    <Typography color="rgba(255, 255, 255, 0.7)" variant="body2">
-                      {leader.role}
-                    </Typography>
-                  </Box>
-                </Box>
-              ))}
-            </Box>
-          </Box>
-        </Grid>
-      ))}
-    </Grid>
-  </Paper>
-</Grid>
+                    {getRankIcon(position)}
+                  </Avatar>
+                );
+              };
 
+              return (
+                <motion.div
+                  key={item.house}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.2 }}
+                >
+                  <ListItem
+                    sx={{
+                      mb: 2,
+                      py: 1,
+                      px: { xs: 1, sm: 2 },
+                      borderRadius: '12px',
+                      backgroundColor: theme.palette.mode === 'light' 
+                        ? index === 0 ? 'rgba(255, 215, 0, 0.1)' 
+                        : index === 1 ? 'rgba(192, 192, 192, 0.1)'
+                        : index === 2 ? 'rgba(205, 127, 50, 0.1)'
+                        : 'transparent'
+                        : 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid',
+                      borderColor: theme.palette.mode === 'light'
+                        ? index === 0 ? 'rgba(255, 215, 0, 0.3)'
+                        : index === 1 ? 'rgba(192, 192, 192, 0.3)'
+                        : index === 2 ? 'rgba(205, 127, 50, 0.3)'
+                        : 'transparent'
+                        : 'rgba(255, 255, 255, 0.1)',
+                      '&:hover': {
+                        transform: 'scale(1.02)',
+                        transition: 'transform 0.3s ease',
+                        boxShadow: '0 3px 10px rgba(0,0,0,0.15)',
+                      },
+                    }}
+                    disableGutters
+                  >                    <Box 
+                        sx={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          width: '100%', 
+                          justifyContent: 'space-between',
+                          flexWrap: { xs: 'wrap', sm: 'nowrap' }
+                        }}
+                      >
+                        <Box sx={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          flexGrow: 1,
+                          maxWidth: { xs: '70%', sm: '80%' }
+                        }}>
+                          <PositionBadge />
+                          <Avatar
+                            src={item.logo}
+                            alt={`${item.houseName} Logo`}
+                            sx={{
+                              width: { xs: 40, sm: 48 },
+                              height: { xs: 40, sm: 48 },
+                              borderRadius: '8px',
+                              marginRight: '16px',
+                              boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.5)',
+                              flexShrink: 0
+                            }}
+                          />
+                          <Box sx={{ minWidth: 0 }}>                            <Box sx={{ 
+                              position: 'relative', 
+                              '&:hover .captain-button': { 
+                                opacity: 1,
+                                visibility: 'visible'
+                              } 
+                            }}>
+                              <Typography 
+                                color={textColor} 
+                                variant="body1" 
+                                fontWeight="bold"
+                                sx={{ 
+                  fontWeight: 'bold',
+                  background: 'linear-gradient(45deg,rgb(26, 126, 114),rgb(228, 144, 54))',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  fontSize: { xs: '1rem', sm: '1.2rem' }
+                                }}
+                              >
+                                {item.houseName}
+                                {index === 0 && (
+                                  <EmojiEvents fontSize="small" sx={{ color: 'gold', flexShrink: 0 }} />
+                                )}
+                              </Typography>
+                              <Button 
+                                className="captain-button"
+                                size="small"
+                                variant="text"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setOpenLeadershipInfo(item.house === openLeadershipInfo ? null : item.house);
+                                }}
+                                sx={{ 
+                                  p: 0,
+                                  minWidth: 'auto',
+                                  textTransform: 'none',
+                                  fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                                  color: 'text.secondary',
+                                  opacity: openLeadershipInfo === item.house ? 1 : 0,
+                                  visibility: openLeadershipInfo === item.house ? 'visible' : 'hidden',
+                                  transition: 'opacity 0.2s ease, visibility 0.2s ease',
+                                  '&:hover': {
+                                    backgroundColor: 'transparent',
+                                    color: item.house === 1 ? '#FFD600' : item.house === 2 ? '#F44336' : '#2196F3',
+                                  }
+                                }}
+                              >
+                                {openLeadershipInfo === item.house ? 'Hide captains' : 'View captains'}
+                              </Button>
+                            </Box>
+                          </Box>
+                        </Box>
+                        
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            minWidth: { xs: '70px', sm: '80px' },
+                            ml: 1
+                          }}
+                        >
+                        <Typography variant="caption" fontWeight="medium" color="textSecondary" sx={{ display: { xs: 'none', sm: 'block' } }}>
+                          POINTS
+                        </Typography>
+                        <Box
+                          sx={{
+                            padding: { xs: '4px 8px', sm: '6px 12px' },
+                            backgroundColor: theme.palette.mode === 'light' ? '#ffffff' : 'rgba(0,0,0,0.2)',
+                            color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : textColor,
+                            borderRadius: '12px',
+                            fontWeight: 'bold',
+                            fontSize: { xs: '1rem', sm: '1.2rem' },
+                            boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
+                            minWidth: { xs: '50px', sm: '60px' },
+                            textAlign: 'center',
+                            border: '1px solid',
+                            borderColor: theme.palette.mode === 'light' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'
+                          }}
+                        >                          {item.points}
+                        </Box>
+                      </Box>                      
+                      {/* Leadership Info - Display captains when clicked */}
+                      {openLeadershipInfo === item.house && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <Box
+                            sx={{
+                              mt: 2,
+                              pt: 2,
+                              borderTop: '1px dashed',
+                              borderColor: 'rgba(0,0,0,0.1)'
+                            }}
+                          >
+                            {teamLeadership.find(team => team.house === item.house)?.leaders.map((leader, idx) => (
+                              <Box 
+                                key={idx}
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                  p: 1,
+                                  mb: idx === 0 ? 1 : 0,
+                                  bgcolor: item.house === 1 
+                                    ? 'rgba(255, 214, 0, 0.05)' 
+                                    : item.house === 2 
+                                      ? 'rgba(244, 67, 54, 0.05)' 
+                                      : 'rgba(33, 150, 243, 0.05)',
+                                  borderRadius: '8px'
+                                }}
+                              >
+                                <Box>
+                                  <Typography variant="caption" color="text.secondary">
+                                    {leader.role}
+                                  </Typography>
+                                  <Typography variant="body2" fontWeight="medium">
+                                    {leader.name}
+                                  </Typography>
+                                </Box>
+                                <Avatar 
+                                  sx={{ 
+                                    width: { xs: 24, sm: 28 }, 
+                                    height: { xs: 24, sm: 28 }, 
+                                    fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                                    ...(leader.role === 'Captain' 
+                                      ? {
+                                          bgcolor: item.house === 1 ? '#FFD600' : item.house === 2 ? '#F44336' : '#2196F3',
+                                          color: item.house === 1 ? '#000' : '#fff'
+                                        }
+                                      : {
+                                          bgcolor: 'transparent',
+                                          border: '1px solid',
+                                          borderColor: item.house === 1 ? '#FFD600' : item.house === 2 ? '#F44336' : '#2196F3',
+                                          color: item.house === 1 ? '#FFD600' : item.house === 2 ? '#F44336' : '#2196F3'
+                                        }
+                                    )
+                                  }}
+                                >
+                                  {leader.role === 'Captain' ? 'C' : 'VC'}
+                                </Avatar>
+                              </Box>
+                            ))}
+                          </Box>
+                        </motion.div>
+                      )}
+                    </Box>
+                  </ListItem>
+                </motion.div>
+              );
+            })}
+          </List>{/* No button here in the leaderboard */}
+        </Paper>
+      </Grid>
+      
+      {/* View Detailed Scores button - centered at bottom */}
+      <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', mt: 8, mb: 6}}>
+        <Button 
+          component={Link}
+          to="/scores"
+          variant="contained"
+          startIcon={<MoreHorizIcon />}
+          size="large"
+          sx={{
+            backgroundImage: 'linear-gradient(135deg, #43cea2,#185a9d)',
+            borderRadius: '12px',
+            padding: { xs: '10px 20px', sm: '12px 24px' },
+            fontSize: { xs: '0.875rem', sm: '1rem' },
+            transition: 'all 0.2s ease',
+            '&:hover': {
+            backgroundImage: 'linear-gradient(135deg,rgb(26, 147, 108),#185a9d)',
+              transform: 'translateY(-2px)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+            }
+          }}
+        >
+          View Detailed Tournament Scores
+        </Button>
+      </Grid>
     </Grid>
   );
 };

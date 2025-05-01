@@ -1154,7 +1154,7 @@ const GuessGame = () => {
             </Typography>                        <Box sx={{ mb: 3 }}>
               <Typography variant="h6" gutterBottom sx={{
                  display: 'inline-block',
-                borderBottom: '3px solid #FFCF50',
+                borderBottom: '3px solid #43cea2',
                 paddingBottom: '4px'
               }}>
                 Quick Game (Top 5)
@@ -1235,7 +1235,7 @@ const GuessGame = () => {
             <Box>
               <Typography variant="h6" gutterBottom sx={{
                  display: 'inline-block',
-                borderBottom: '3px solid #FFCF50',
+                borderBottom: '3px solid #43cea2',
                 paddingBottom: '4px'
               }}>
                 Full Game (Top 5)

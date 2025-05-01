@@ -181,11 +181,18 @@ const Home = () => {
               justifyContent: 'center',
               flexWrap: 'wrap'
             }}
-          >
-            <Button 
+          >            <Button 
               component={Link}
               to="/events"
               variant="contained" 
+              onClick={() => {
+                if (window.gtag) {
+                  window.gtag('event', 'click', {
+                    event_category: 'navigation',
+                    event_label: 'View Events Button (Homepage)'
+                  });
+                }
+              }}
               sx={{ 
             backgroundColor: '#43cea2',
             color: '#000',
@@ -200,6 +207,14 @@ const Home = () => {
               component={Link}
               to="/winners"
               variant="contained" 
+              onClick={() => {
+                if (window.gtag) {
+                  window.gtag('event', 'click', {
+                    event_category: 'navigation',
+                    event_label: 'See Winners Button (Homepage)'
+                  });
+                }
+              }}
               sx={{ 
             backgroundColor: '#43cea2',
             color: '#000',
@@ -438,14 +453,22 @@ const Home = () => {
                                 {index === 0 && (
                                   <EmojiEvents fontSize="small" sx={{ color: 'gold', flexShrink: 0 }} />
                                 )}
-                              </Typography>
-                              <Button 
+                              </Typography>                              <Button 
                                 className="captain-button"
                                 size="small"
                                 variant="text"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  setOpenLeadershipInfo(item.house === openLeadershipInfo ? null : item.house);
+                                  const newValue = item.house === openLeadershipInfo ? null : item.house;
+                                  setOpenLeadershipInfo(newValue);
+                                  
+                                  // Track the interaction
+                                  if (window.gtag) {
+                                    window.gtag('event', newValue ? 'show' : 'hide', {
+                                      event_category: 'leaderboard',
+                                      event_label: `${newValue ? 'View' : 'Hide'} captains - ${item.houseName}`
+                                    });
+                                  }
                                 }}
                                 sx={{ 
                                   p: 0,
@@ -574,13 +597,20 @@ const Home = () => {
       </Grid>
       
       {/* View Detailed Scores button - centered at bottom */}
-      <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', mt: 8, mb: 6}}>
-        <Button 
+      <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', mt: 8, mb: 6}}>        <Button 
           component={Link}
           to="/scores"
           variant="contained"
           startIcon={<MoreHorizIcon />}
           size="large"
+          onClick={() => {
+            if (window.gtag) {
+              window.gtag('event', 'click', {
+                event_category: 'navigation',
+                event_label: 'View Detailed Scores Button'
+              });
+            }
+          }}
           sx={{
             backgroundImage: 'linear-gradient(135deg, #43cea2,#185a9d)',
             borderRadius: '12px',

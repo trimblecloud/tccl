@@ -170,10 +170,20 @@ const DetailedScores = ({ showButton = true, initiallyOpen = false, containerSx 
   
   return (
     <Box sx={{ width: '100%', mb: 4, ...containerSx }}>
-      {showButton && (
-        <Button 
+      {showButton && (        <Button 
           variant="contained" 
-          onClick={() => setOpen(!open)}
+          onClick={() => {
+            const newOpenState = !open;
+            setOpen(newOpenState);
+            
+            // Track detailed scores view toggle
+            if (window.gtag) {
+              window.gtag('event', newOpenState ? 'expand' : 'collapse', {
+                event_category: 'scores',
+                event_label: newOpenState ? 'Expanded detailed scores' : 'Collapsed detailed scores'
+              });
+            }
+          }}
           startIcon={<EmojiEvents />}
           endIcon={open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
           sx={{
@@ -215,12 +225,22 @@ const DetailedScores = ({ showButton = true, initiallyOpen = false, containerSx 
             flexWrap: 'wrap',
             justifyContent: {xs: 'center', sm: 'flex-end'}
           }}>
-            {Object.keys(gameLabels).map(tab => (
-              <Button
+            {Object.keys(gameLabels).map(tab => (              <Button
                 key={tab}
                 variant={activeTab === tab ? "contained" : "outlined"}
                 size="small"
-                onClick={() => setActiveTab(tab)}
+                onClick={() => {
+                  setActiveTab(tab);
+                  
+                  // Track score filter change
+                  if (window.gtag) {
+                    window.gtag('event', 'filter', {
+                      event_category: 'scores',
+                      event_label: `Filtered scores by ${gameLabels[tab]}`,
+                      event_value: tab
+                    });
+                  }
+                }}
                 sx={{
                   borderRadius: '20px',
                   minWidth: '80px',                  

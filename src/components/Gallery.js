@@ -133,21 +133,45 @@ const Gallery = () => {
   const [open, setOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
   const [imageLoaded, setImageLoaded] = useState(false);
-
   // Handle event tab change
   const handleEventChange = (event, newValue) => {
     setSelectedEvent(newValue);
+    
+    // Track gallery category change
+    if (window.gtag) {
+      window.gtag('event', 'select', {
+        event_category: 'gallery',
+        event_label: `Selected ${events[newValue].name} gallery`,
+        event_value: newValue
+      });
+    }
   };
-
   const handleClickOpen = (index) => {
     setSelectedImageIndex(index);
     setImageLoaded(false);
     setOpen(true);
+    
+    // Track photo view event
+    if (window.gtag) {
+      window.gtag('event', 'view', {
+        event_category: 'gallery',
+        event_label: `${events[selectedEvent].name} - Photo ${index + 1}`,
+        event_value: index + 1
+      });
+    }
   };
 
   const handleClose = () => {
     setOpen(false);
     setSelectedImageIndex(null);
+    
+    // Track photo viewer close event
+    if (window.gtag) {
+      window.gtag('event', 'close', {
+        event_category: 'gallery',
+        event_label: 'Photo viewer closed'
+      });
+    }
   };
 
   const handleNext = () => {

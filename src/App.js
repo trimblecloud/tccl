@@ -22,6 +22,9 @@ import {
   ListItemIcon,
   Divider
 } from '@mui/material';
+import { initGA } from './analytics';
+import PageTracker from './components/PageTracker';
+import CookieConsent from './components/CookieConsent';
 import { 
   Brightness4 as Brightness4Icon, 
   Brightness7 as Brightness7Icon,
@@ -68,10 +71,25 @@ const NavLink = ({ to, children, isMobile, theme, onClick }) => {
     return null; // Mobile menu is handled separately
   }
   
+  const handleNavClick = () => {
+    // Track navigation event
+    if (window.gtag) {
+      window.gtag('event', 'navigate', {
+        event_category: 'navigation',
+        event_label: `Navigated to ${to}`,
+        value: to === '/' ? 0 : 1
+      });
+    }
+    
+    // Call original onClick if provided
+    if (onClick) onClick();
+  };
+  
   return (
     <Button
       component={Link}
       to={to}
+      onClick={handleNavClick}
       sx={{
         color: theme.palette.text.primary,
         fontFamily: theme.typography.fontFamily,
@@ -106,6 +124,14 @@ function App() {
     return savedMode || 'light';
   });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  // Initialize Google Analytics
+  useEffect(() => {
+    if (process.env.REACT_APP_GA_MEASUREMENT_ID) {
+      initGA(process.env.REACT_APP_GA_MEASUREMENT_ID);
+      console.log('Google Analytics initialized');
+    }
+  }, []);
 
   const theme = useMemo(
     () =>
@@ -151,6 +177,16 @@ function App() {
       const newMode = prevMode === 'light' ? 'dark' : 'light';
       // Save the theme preference to localStorage
       localStorage.setItem('theme-mode', newMode);
+      
+      // Track theme change with Google Analytics
+      if (window.gtag) {
+        window.gtag('event', 'theme_change', {
+          event_category: 'user_preference',
+          event_label: `Changed theme to ${newMode} mode`,
+          value: newMode === 'dark' ? 1 : 0
+        });
+      }
+      
       return newMode;
     });
   };
@@ -299,6 +335,9 @@ function App() {
         {/* Mobile Menu Drawer */}
         {mobileDrawer}
         
+        {/* Google Analytics Page Tracker */}
+        <PageTracker />
+        
         <Container maxWidth="md" sx={{ marginTop: '20px' }}>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -325,6 +364,9 @@ function App() {
           <Typography variant="body2">A Team Building Initiative</Typography>
           <Typography variant="body2">Trimble Cloud © 2025</Typography>
         </Box>
+        
+        {/* Cookie Consent Banner */}
+        <CookieConsent />
       </Router>
     </ThemeProvider>
   );

@@ -38,6 +38,7 @@ const detailedScores = {
     { id: "chess_runners", name: "Game 4 - Chess - Runners" },
     { id: "chess_winners", name: "Game 4 - Chess - Winners" },
     { id: "cards_tower", name: "Cards Tower" },
+    { id: "card_tower_submission", name: "Cards Tower - Participants Submission" },
     // Add new categories here
   ],
   houses: [
@@ -70,6 +71,7 @@ const detailedScores = {
         "chess_runners": 0,
         "chess_winners": 0,
         "cards_tower": 0,
+        "card_tower_submission":10
       }
     },
     { 
@@ -101,6 +103,7 @@ const detailedScores = {
         "chess_runners": 80,
         "chess_winners": 120,
         "cards_tower": 100,
+        "card_tower_submission":5
       }
     },
     { 
@@ -132,6 +135,7 @@ const detailedScores = {
         "chess_runners": 0,
         "chess_winners": 0,
         "cards_tower": 50,
+        "card_tower_submission":0
       }
     },
   ]
@@ -206,7 +210,7 @@ const DetailedScores = ({ showButton = true, initiallyOpen = false, containerSx 
             <span style={{ backgroundColor: '#4CAF50', color: 'white', padding: '3px 8px', borderRadius: '4px', marginRight: '8px' }}>
               Updated
             </span>
-            April 30, 2025
+            May 04, 2025
           </Typography>
           
           <Box sx={{ 

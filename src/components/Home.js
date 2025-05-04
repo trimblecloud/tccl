@@ -111,104 +111,195 @@ const Home = () => {
 
   // Sort leaderboard by points in descending order
   const sortedLeaderBoard = leaderBoard.sort((a, b) => b.points - a.points);  return (
-    <Grid container spacing={3}>
-        <Grid item xs={12}>
+    <Grid container spacing={3}>      <Grid item xs={12}>
           <Box
             sx={{
-          position: 'relative',
-          borderRadius: '16px',
-          overflow: 'hidden',
-          boxShadow: '0px 6px 12px rgba(0, 0, 0, 0.15)',
-          mb: 4,
-          backgroundColor: theme.palette.background.paper,
-          height: { xs: '200px', sm: '250px', md: '300px' },
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-            }}
-          >
-            <Box sx={{ 
-          position: 'absolute', 
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: `url(${tcclBanner})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          filter: 'blur(5px)',
-          transform: 'scale(1.1)', // Prevents blur edges from showing
-            }} />
-            
-            <Box sx={{ 
-          position: 'absolute', 
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          zIndex: 1,
-            }} />
-            
-            <Box sx={{ 
-          position: 'relative', 
-          zIndex: 2, 
-          textAlign: 'center',
-          width: '100%',
-          p: { xs: 2, sm: 4 }
-            }}>
-          <Typography variant="h3" component="h1" sx={{ 
-            fontWeight: 'bold',
-            background: 'linear-gradient(45deg,#43cea2 ,#43cea2)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            fontSize: { xs: '1.8rem', sm: '2.5rem', md: '3rem' }
-          }}>
-            Trimble Cloud Championship League
-          </Typography>
-          <Typography variant="h5" sx={{ 
-            color: theme.palette.mode === 'light'? '#02aab0 ':'#FFFFFF'  ,
-            mb: 3,
-            textShadow: '0 2px 4px rgba(0,0,0,0.5)',
-            fontSize: { xs: '1rem', sm: '1.2rem', md: '1.5rem' }
-          }}>
-            A team building initiative for Trimble Cloud engineering
-          </Typography>
-          <Box 
-            sx={{ 
-              display: 'flex', 
-              gap: 2, 
+              position: 'relative',
+              borderRadius: { xs: '12px', sm: '16px', md: '24px' },
+              overflow: 'hidden',
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.15)',
+              mb: 4,
+              backgroundColor: theme.palette.background.paper,
+              height: { xs: '220px', sm: '280px', md: '340px' },
+              display: 'flex',
               justifyContent: 'center',
-              flexWrap: 'wrap'
+              alignItems: 'center',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '100%',
+                background: theme.palette.mode === 'light'
+                  ? 'linear-gradient(135deg, rgba(67, 206, 162, 0.85), rgba(24, 90, 157, 0.85))'
+                  : 'linear-gradient(135deg, rgba(46, 7, 63, 0.85), rgba(67, 67, 120, 0.85))',
+                opacity: 0.5,
+                zIndex: 1,
+              }
             }}
           >
-            <Button 
-              component={Link}
-              to="/events"
-              variant="contained" 
+            <Box 
+              component={motion.div}
+              initial={{ scale: 1.05 }}
+              animate={{ 
+                scale: [1.05, 1.1, 1.05],
+                filter: ['blur(3px)', 'blur(4px)', 'blur(3px)']
+              }}
+              transition={{ 
+                duration: 20,
+                repeat: Infinity,
+                repeatType: 'reverse'
+              }}
               sx={{ 
-            backgroundColor: '#43cea2',
-            color: '#000',
-            '&:hover': {
-              backgroundColor: '#00cdac',
-            }
+                position: 'absolute', 
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundImage: `url(${tcclBanner})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                transform: 'scale(1.05)', // Prevents blur edges from showing
+              }} 
+            />
+            
+            <Box sx={{ 
+              position: 'absolute', 
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: theme.palette.mode === 'light'
+                ? 'radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%)'
+                : 'radial-gradient(circle at center, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.8) 100%)',
+              zIndex: 1,
+            }} />
+            
+            <Box 
+              component={motion.div}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              sx={{ 
+                position: 'relative', 
+                zIndex: 2, 
+                textAlign: 'center',
+                width: '100%',
+                p: { xs: 2, sm: 4 }
               }}
             >
-              View Events
-            </Button>
+              <Typography 
+                variant="h3" 
+                component="h1"
+                sx={{ 
+                  fontWeight: 'bold',
+                  background: theme.palette.mode === 'light'
+                    ? 'linear-gradient(45deg, #90caf9,rgb(28, 146, 152))'
+                    : 'linear-gradient(45deg, #90caf9, #ce93d8)',
+                  backgroundSize: '200% auto',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  fontSize: { xs: '1.8rem', sm: '2.5rem', md: '3.3rem' },
+                  textShadow: '0 2px 15px rgba(0, 0, 0, 0.2)',
+                  letterSpacing: '0.5px',
+                  animation: 'gradient 8s ease infinite',
+                  '@keyframes gradient': {
+                    '0%': {
+                      backgroundPosition: '0% 50%'
+                    },
+                    '50%': {
+                      backgroundPosition: '100% 50%'
+                    },
+                    '100%': {
+                      backgroundPosition: '0% 50%'
+                    }
+                  }
+                }}
+              >
+                Three Houses
+              </Typography>
+              
+              <Typography 
+                variant="h5"
+                component={motion.p}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+                sx={{ 
+                  color: '#FFFFFF',
+                  mb: 3.5,
+                  mt: 1,
+                  textShadow: '0 2px 10px rgba(0,0,0,0.7)',
+                  fontSize: { xs: '1rem', sm: '1.2rem', md: '1.5rem' },
+                  fontWeight: 300,
+                  letterSpacing: '1px'
+                }}
+              >
+                One Goal
+                
+              </Typography>
+              
+              <Box 
+                component={motion.div}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.5 }}
+                sx={{ 
+                  display: 'flex', 
+                  gap: { xs: 1.5, sm: 2 }, 
+                  justifyContent: 'center',
+                  flexWrap: 'wrap',
+                  mt: 2
+                }}
+              >
+                <Button 
+                  component={Link}
+                  to="/events"
+                  variant="contained" 
+                  sx={{ 
+                    backgroundImage: 'linear-gradient(135deg, #43cea2 0%, #185a9d 100%)',
+                    color: '#fff',
+                    fontWeight: 500,
+                    px: { xs: 2, sm: 3 },
+                    py: { xs: 1, sm: 1.2 },
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.15)',
+                    textTransform: 'none',
+                    fontSize: { xs: '0.9rem', sm: '1rem' },
+                    '&:hover': {
+                      backgroundImage: 'linear-gradient(135deg, #3db796 0%, #154c88 100%)',
+                      boxShadow: '0 6px 18px rgba(0, 0, 0, 0.2)',
+                      transform: 'translateY(-2px)',
+                    },
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  EVENTS
+                </Button>
             <Button 
               component={Link}
               to="/winners"
               variant="contained" 
               sx={{ 
-            backgroundColor: '#43cea2',
-            color: '#000',
-            '&:hover': {
-              backgroundColor: '#00cdac',
-            }
-              }}
+                    backgroundImage: 'linear-gradient(135deg, #43cea2 0%, #185a9d 100%)',
+                    color: '#fff',
+                    fontWeight: 500,
+                    px: { xs: 2, sm: 3 },
+                    py: { xs: 1, sm: 1.2 },
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.15)',
+                    textTransform: 'none',
+                    fontSize: { xs: '0.9rem', sm: '1rem' },
+                    '&:hover': {
+                      backgroundImage: 'linear-gradient(135deg, #3db796 0%, #154c88 100%)',
+                      boxShadow: '0 6px 18px rgba(0, 0, 0, 0.2)',
+                      transform: 'translateY(-2px)',
+                    },
+                    transition: 'all 0.3s ease'
+                  }}
             >
-              See Winners
+              WINNERS
             </Button>
           </Box>
             </Box>

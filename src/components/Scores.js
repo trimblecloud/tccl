@@ -53,7 +53,7 @@ const Scores = () => {
               gap: 1
             }}
           >
-            Detailed Scores
+            Scores
             <EmojiEvents fontSize="large" color="primary" />
           </Typography>
         </Box>

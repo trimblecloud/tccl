@@ -289,6 +289,10 @@ function App() {
 
   useEffect(() => {
     document.body.style.backgroundColor = theme.palette.background.default;
+    // Add overflow control to prevent unwanted horizontal scrolling
+    document.body.style.overflowX = 'hidden';
+    document.documentElement.style.overflowX = 'hidden';
+    document.documentElement.style.maxWidth = '100vw';
   }, [theme.palette.background.default]);
 
   // Mobile drawer menu
@@ -319,6 +323,7 @@ function App() {
             : 'linear-gradient(135deg, rgba(46, 7, 63, 0.9) 0%, rgba(28, 5, 38, 0.9) 100%)',
           boxShadow: '-5px 0 15px rgba(0, 0, 0, 0.2)',
           overflowY: 'auto',
+          overflowX: 'hidden',
           transition: 'box-shadow 0.3s ease-in-out',
           padding: { xs: '12px 0', sm: '16px 0' }
         }
@@ -478,6 +483,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <Router>
+        <Box sx={{ overflowX: 'hidden', width: '100%' }}>
         <AppBar 
           position="sticky" 
           elevation={scrolled ? 2 : 0} 
@@ -690,6 +696,7 @@ function App() {
             width: '100%',
             overflow: 'hidden',
             paddingTop: '20px',
+            maxWidth: '100vw',
           }}
         >
           <Container 
@@ -698,6 +705,7 @@ function App() {
               width: '100%',
               paddingLeft: { xs: '16px', sm: '24px' },
               paddingRight: { xs: '16px', sm: '24px' },
+              overflowX: 'hidden',
             }}
           >
             <Routes>
@@ -726,6 +734,7 @@ function App() {
         >
           <Typography variant="body2">A Team Building Initiative</Typography>
           <Typography variant="body2">Trimble Cloud © 2025</Typography>
+        </Box>
         </Box>
       </Router>
     </ThemeProvider>

@@ -201,8 +201,8 @@ const Events = () => {
     },
     { 
       name: 'Cricket',
-      startDate: '5/10/2025',
-      endDate: '5/10/2025',
+      startDate: '5/23/2025',
+      endDate: '5/23/2025',
       dayInfo: 'Saturday',
       time: '6:00 - 11:00 AM',
       details: 'Morning cricket tournament between house teams.',

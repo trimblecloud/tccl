@@ -28,7 +28,8 @@ import {
   Apps as AppsIcon,
   CollectionsRounded,
   Casino as ChessIcon,
-  Architecture as CardsTowerIcon
+  Architecture as CardsTowerIcon,
+  Brush as BrushIcon
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import yellowSparksLogo from './logo/yellow-sparks-logo.png';
@@ -73,6 +74,18 @@ const importAll = (r) => r.keys().map(r);
 
 // Events data structure - extensible for adding more events
 const events = [
+  {
+    id: 'buildyourlogo',
+    name: 'Build Your Logo',
+    description: 'Creative logo building competition testing patience and precision',
+    icon: <BrushIcon />,
+    images: importAll(require.context('./gallery/buildyourlogo', false, /\.(png|jpe?g|JPG|svg)$/)),
+    date: 'May 7, 2025',
+    badge: {
+      count: 0, // Will be set dynamically
+      color: 'info'
+    }
+  },
   {
     id: 'tabletennis',
     name: 'Table Tennis',

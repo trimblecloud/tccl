@@ -53,6 +53,18 @@ import snehaThangaveluPhoto from './images/participants/participant_sneha_thanga
 import miruthuvikasiniSPhoto from './images/participants/participant_miruthuvikasini_s.jpg';
 import meghnaSathyaMoorthyPhoto from './images/participants/participant_meghna_sathya_moorthy.jpg';
 
+// Import participant photos - Build Your Logo
+import dharaniSanjaiBPhoto from './images/participants/participant_dharani_sanjai_b.jpg';
+import paulsonJPhoto from './images/participants/participant_paulson_j.jpg';
+import harivarthiniRPhoto from './images/participants/participant_harivarthini_r.jpg';
+import vinociKLPhoto from './images/participants/participant_vinoci_k_l.jpg';
+import sudeepMPhoto from './images/participants/participant_sudeep_m.jpg';
+import dhineshkumarDPhoto from './images/participants/participant_dhineshkumar_d.jpg';
+import sumithraKamalakkannanPhoto from './images/participants/participant_sumithra_kamalakkannan.jpg';
+import dhivyadharshiniTPhoto from './images/participants/participant_dhivyadharshini_t.jpg';
+import abdulKhaliqPhoto from './images/participants/participant_abdul_khaliq_mohamed_sherfudeen.jpg';
+import vinethPPhoto from './images/participants/participant_vineth_p.jpg';
+
 // Styled components
 const EventCard = styled(Card)(({ theme, color }) => ({
   marginBottom: '24px',
@@ -131,6 +143,41 @@ const Winners = () => {
     }
   };  // Winners data for each event
   const eventsData = [
+    {
+      id: 'build-your-logo',
+      name: 'Build Your Logo',
+      icon: <EmojiEventsIcon />,
+      colors: ['#2196F3', '#1565C0'],
+      description: 'Team competition to design and create the most creative and representative logo',
+      winners: {
+        house: 'house2',
+        members: [
+          { name: 'Dharani Sanjai B', photo: dharaniSanjaiBPhoto },
+          { name: 'RanjithBabu Daruman', photo: ranjithbabuDarumanPhoto },
+          { name: 'Paulson J', photo: paulsonJPhoto },
+          { name: 'Harivarthini R', photo: harivarthiniRPhoto },
+          { name: 'Vinoci K L', photo: vinociKLPhoto },
+          { name: 'Gowsalya Ramasamy', photo: gowsalyaRamasamyPhoto },
+          { name: 'Sudeep M', photo: sudeepMPhoto },
+          { name: 'Dhineshkumar D', photo: dhineshkumarDPhoto },
+          { name: 'Infant Shiny A', photo: infantShinyPhoto }
+        ]
+      },
+      runners: {
+        house: 'house3',
+        members: [
+          { name: 'Sneha Thangavelu', photo: snehaThangaveluPhoto },
+          { name: 'Rajkumar S', photo: rajkumarSPhoto },
+          { name: 'Sumithra Kamalakannan', photo: sumithraKamalakkannanPhoto },
+          { name: 'Dhivyadharshini T', photo: dhivyadharshiniTPhoto },
+          { name: 'Abdul Khaliq Mohamed Sherfudeen', photo: abdulKhaliqPhoto },
+          { name: 'Priya Rousini Duraiazhagan', photo: priyaRousiniPhoto },
+          { name: 'Nikhilesh S P', photo: nikhileshSPPhoto },
+          { name: 'Vineth P', photo: vinethPPhoto },
+          { name: 'Miruthuvikasini S', photo: miruthuvikasiniSPhoto }
+        ]
+      }
+    },
     {
       id: 'chess',
       name: 'Chess',
@@ -222,8 +269,7 @@ const Winners = () => {
           { name: 'Krithick S', photo: krithickSPhoto }
         ]
       }
-    },
-    {
+    },    {
       id: 'carrom',
       name: 'Carrom',
       icon: <CasinoIcon />,

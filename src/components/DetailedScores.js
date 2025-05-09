@@ -36,9 +36,10 @@ const detailedScores = {
     { id: "chess_r4_participation", name: "Game 4 - Chess - Round 4 Participation" },
     { id: "chess_semi_participation", name: "Game 4 - Chess - Semi Final Participation" },
     { id: "chess_runners", name: "Game 4 - Chess - Runners" },
-    { id: "chess_winners", name: "Game 4 - Chess - Winners" },
-    { id: "cards_tower", name: "Cards Tower" },
-    { id: "card_tower_submission", name: "Cards Tower - Participants Submission" },
+    { id: "chess_winners", name: "Game 4 - Chess - Winners" },    { id: "cards_tower", name: "Cards Tower" },
+    { id: "cards_tower_submission", name: "Cards Tower - Participants Submission" },
+    { id: "logo_submission", name: "Game 6 - Build Your Logo - Participants Submission" },
+    { id: "logo_main", name: "Game 6 - Build Your Logo" },
     // Add new categories here
   ],
   houses: [
@@ -67,11 +68,12 @@ const detailedScores = {
         "chess_r2_participation": 100,
         "chess_r3_participation": 60,
         "chess_r4_participation": 0,
-        "chess_semi_participation": 0,
-        "chess_runners": 0,
+        "chess_semi_participation": 0,        "chess_runners": 0,
         "chess_winners": 0,
         "cards_tower": 0,
-        "card_tower_submission":10
+        "cards_tower_submission": 10,
+        "logo_submission": 0,
+        "logo_main": 0
       }
     },
     { 
@@ -99,11 +101,12 @@ const detailedScores = {
         "chess_r2_participation": 120,
         "chess_r3_participation": 120,
         "chess_r4_participation": 120,
-        "chess_semi_participation": 50,
-        "chess_runners": 80,
+        "chess_semi_participation": 50,        "chess_runners": 80,
         "chess_winners": 120,
         "cards_tower": 100,
-        "card_tower_submission":5
+        "cards_tower_submission": 5,
+        "logo_submission": 20,
+        "logo_main": 100
       }
     },
     { 
@@ -131,11 +134,12 @@ const detailedScores = {
         "chess_r2_participation": 60,
         "chess_r3_participation": 60,
         "chess_r4_participation": 40,
-        "chess_semi_participation": 50,
-        "chess_runners": 0,
+        "chess_semi_participation": 50,        "chess_runners": 0,
         "chess_winners": 0,
         "cards_tower": 50,
-        "card_tower_submission":0
+        "cards_tower_submission": 0,
+        "logo_submission": 10,
+        "logo_main": 50
       }
     },
   ]
@@ -150,8 +154,7 @@ const DetailedScores = ({ showButton = true, initiallyOpen = false, containerSx 
   const [open, setOpen] = useState(initiallyOpen);
   const [activeTab, setActiveTab] = useState('all');
   const theme = useTheme();
-  
-  // Group categories by game
+    // Group categories by game
   const gameCategories = {
     'all': detailedScores.categories,
     'general': detailedScores.categories.filter(cat => cat.id.includes('house_details')),
@@ -160,6 +163,7 @@ const DetailedScores = ({ showButton = true, initiallyOpen = false, containerSx 
     'game3': detailedScores.categories.filter(cat => cat.id.includes('carrom_')),
     'game4': detailedScores.categories.filter(cat => cat.id.includes('chess_')),
     'game5': detailedScores.categories.filter(cat => cat.id.includes('cards_tower')),
+    'game6': detailedScores.categories.filter(cat => cat.id.includes('logo_')),
   };
   
   const gameLabels = {
@@ -170,6 +174,7 @@ const DetailedScores = ({ showButton = true, initiallyOpen = false, containerSx 
     'game3': 'Carrom',
     'game4': 'Chess',
     'game5': 'Cards Tower',
+    'game6': 'Build Your Logo',
   };
   
   return (
@@ -343,6 +348,7 @@ const DetailedScores = ({ showButton = true, initiallyOpen = false, containerSx 
                         category.id.includes('carrom_') ? '#F44336' : 
                         category.id.includes('chess_') ? '#4CAF50' :
                         category.id.includes('cards_tower') ? '#9C27B0' :
+                        category.id.includes('logo_') ? '#dfff00' :
                         '#757575'
                       }`,
                       paddingLeft: '16px',
@@ -366,7 +372,7 @@ const DetailedScores = ({ showButton = true, initiallyOpen = false, containerSx 
                           borderRadius: '4px',
                           backgroundColor: (() => {
                             // Special case for Bet Your Brain categories
-                            if (category.id.includes('bet_your_brain')|| category.id.includes('cards_tower')) {
+                            if (category.id.includes('bet_your_brain')|| category.id.includes('cards_tower')|| category.id.includes('logo')) {
                               // Find max score for this category across all houses
                               const scores = detailedScores.houses.map(h => h.points[category.id] || 0);
                               const maxScore = Math.max(...scores);
@@ -402,7 +408,7 @@ const DetailedScores = ({ showButton = true, initiallyOpen = false, containerSx 
                           })(),
                           color: (() => {
                             // Special case for Bet Your Brain categories
-                            if (category.id.includes('bet_your_brain')|| category.id.includes('cards_tower')) {
+                            if (category.id.includes('bet_your_brain')|| category.id.includes('cards_tower')|| category.id.includes('logo')) {
                               // Find max score for this category across all houses
                               const scores = detailedScores.houses.map(h => h.points[category.id] || 0);
                               const maxScore = Math.max(...scores);

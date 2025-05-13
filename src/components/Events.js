@@ -183,8 +183,8 @@ const Events = () => {
     },
     { 
       name: 'Tug of war',
-      startDate: '5/14/2025',
-      endDate: '5/14/2025',
+      startDate: '5/21/2025',
+      endDate: '5/21/2025',
       dayInfo: 'Wednesday',
       time: '4:00 - 5:00 PM',
       details: 'Show your team strength in this classic tug of war competition.',
@@ -203,7 +203,7 @@ const Events = () => {
       name: 'Cricket',
       startDate: '5/23/2025',
       endDate: '5/23/2025',
-      dayInfo: 'Saturday',
+      dayInfo: 'Friday',
       time: '6:00 - 11:00 AM',
       details: 'Morning cricket tournament between house teams.',
       categories: ['Outdoor', 'Sports']

@@ -135,7 +135,56 @@ const Fixtures = () => {
   };
   
   // All tournaments data combined
-  const allTournaments = [   {
+  const allTournaments = [     {
+      id: 'badminton',
+      name: 'Badminton (Doubles)',
+      icon: <SportsTennisIcon />,
+      color: '#2196F3', // Blue
+      categories: ['Indoor', 'Sports'],
+      description: 'Doubles tournament with men\'s, women\'s, and mixed categories.',
+      venue: 'DB Jain College, Thoraipakkam',
+      timings: [
+        { 
+          date: '15th May 2025 (Thursday)', 
+          details: 'Men\'s and Women\'s Doubles',
+          specificTimings: [
+            { group: 'Men\'s Doubles', time: '4:00 PM - 5:30 PM' },
+            { group: 'Women\'s Doubles', time: '5:30 PM - 7:00 PM' }
+          ]
+        },
+        { 
+          date: '16th May 2025 (Friday)', 
+          details: 'Mixed Doubles and Finals',
+          specificTimings: [
+            { group: 'Mixed Doubles', time: '4:00 PM - 5:30 PM' },
+            { group: 'All Finals', time: '5:30 PM - 7:00 PM' }
+          ]
+        },
+      ],
+      fixtures: [
+        {
+          title: 'Men\'s Doubles Tournament',
+          url: 'https://challonge.com/tcclmensbadminton/module',
+          notes: [
+            'This bracket shows the Men\'s Doubles tournament matches and results.'
+          ]
+        },
+        {
+          title: 'Women\'s Doubles Tournament',
+          url: 'https://challonge.com/tcclwomensbadminton/module',
+          notes: [
+            'This bracket shows the Women\'s Doubles tournament matches and results.'
+          ]
+        },
+        {
+          title: 'Mixed Doubles Tournament',
+          url: 'https://challonge.com/tcclmixedbadminton/module',
+          notes: [
+            'This bracket shows the Mixed Doubles tournament matches and results.'
+          ]
+        }
+      ]
+    },{
       id: 'chess',
       name: 'Chess',
       icon: <ViewCompactIcon />,
@@ -218,39 +267,6 @@ const Fixtures = () => {
         {
           title: 'Semifinal League',
           url: 'https://challonge.com/Tccl_TT_Finals/module',
-          notes: []
-        }
-      ]
-    },    {
-      id: 'badminton',
-      name: 'Badminton (Doubles)',
-      icon: <SportsTennisIcon />,
-      color: '#2196F3', // Blue
-      categories: ['Indoor', 'Sports'],
-      description: 'Doubles tournament with men\'s, women\'s, and mixed categories.',
-      venue: 'TBD',
-      timings: [
-        { 
-          date: '15th May 2025 (Thursday)', 
-          details: 'Men\'s and Women\'s Doubles',
-          specificTimings: [
-            { group: 'Men\'s Doubles', time: '4:00 PM - 5:30 PM' },
-            { group: 'Women\'s Doubles', time: '5:30 PM - 7:00 PM' }
-          ]
-        },
-        { 
-          date: '16th May 2025 (Friday)', 
-          details: 'Mixed Doubles and Finals',
-          specificTimings: [
-            { group: 'Mixed Doubles', time: '4:00 PM - 5:30 PM' },
-            { group: 'All Finals', time: '5:30 PM - 7:00 PM' }
-          ]
-        },
-      ],
-      fixtures: [
-        {
-          title: 'Tournament Bracket',
-          url: 'https://challonge.com/trimblecloud/badminton2025/module',
           notes: []
         }
       ]

@@ -36,10 +36,29 @@ const detailedScores = {
     { id: "chess_r4_participation", name: "Game 4 - Chess - Round 4 Participation" },
     { id: "chess_semi_participation", name: "Game 4 - Chess - Semi Final Participation" },
     { id: "chess_runners", name: "Game 4 - Chess - Runners" },
-    { id: "chess_winners", name: "Game 4 - Chess - Winners" },    { id: "cards_tower", name: "Cards Tower" },
+    { id: "chess_winners", name: "Game 4 - Chess - Winners" },    
+    { id: "cards_tower", name: "Cards Tower" },
     { id: "cards_tower_submission", name: "Cards Tower - Participants Submission" },
     { id: "logo_submission", name: "Game 6 - Build Your Logo - Participants Submission" },
     { id: "logo_main", name: "Game 6 - Build Your Logo" },
+    // Badminton Men's Doubles Categories
+    { id: "badminton_mens_r1_participation", name: "Game 7 - Badminton Mens Doubles - Round 1 Participation" },
+    { id: "badminton_mens_r2_participation", name: "Game 7 - Badminton Mens Doubles - Round 2 Participation" },
+    { id: "badminton_mens_r3_participation", name: "Game 7 - Badminton Mens Doubles - Round 3 Participation" },
+    { id: "badminton_mens_semi_participation", name: "Game 7 - Badminton Mens Doubles - Semi Final Participation" },
+    { id: "badminton_mens_runners", name: "Game 7 - Badminton Mens Doubles - Runners" },
+    { id: "badminton_mens_winners", name: "Game 7 - Badminton Mens Doubles - Winners" },
+    // Badminton Women's Doubles Categories
+    { id: "badminton_womens_r1_participation", name: "Game 7 - Badminton Womens Doubles - Round 1 Participation" },
+    { id: "badminton_womens_semi_participation", name: "Game 7 - Badminton Womens Doubles - Semi Final Participation" },
+    { id: "badminton_womens_runners", name: "Game 7 - Badminton Womens Doubles - Runners" },
+    { id: "badminton_womens_winners", name: "Game 7 - Badminton Womens Doubles - Winners" },
+    // Badminton Mixed Doubles Categories
+    { id: "badminton_mixed_r1_participation", name: "Game 7 - Badminton Mixed Doubles - Round 1 Participation" },
+    { id: "badminton_mixed_r2_participation", name: "Game 7 - Badminton Mixed Doubles - Round 2 Participation" },
+    { id: "badminton_mixed_semi_participation", name: "Game 7 - Badminton Mixed Doubles - Semi Final Participation" },
+    { id: "badminton_mixed_runners", name: "Game 7 - Badminton Mixed Doubles - Runners" },
+    { id: "badminton_mixed_winners", name: "Game 7 - Badminton Mixed Doubles - Winners" },
     // Add new categories here
   ],
   houses: [
@@ -73,7 +92,25 @@ const detailedScores = {
         "cards_tower": 0,
         "cards_tower_submission": 10,
         "logo_submission": 0,
-        "logo_main": 0
+        "logo_main": 0,
+        // Badminton Men's Doubles
+        "badminton_mens_r1_participation": 20,
+        "badminton_mens_r2_participation": 60,
+        "badminton_mens_r3_participation": 30,
+        "badminton_mens_semi_participation": 40,
+        "badminton_mens_runners": 70,
+        "badminton_mens_winners": 0,
+        // Badminton Women's Doubles
+        "badminton_womens_r1_participation": 20,
+        "badminton_womens_semi_participation": 40,
+        "badminton_womens_runners": 0,
+        "badminton_womens_winners": 100,
+        // Badminton Mixed Doubles
+        "badminton_mixed_r1_participation": 30,
+        "badminton_mixed_r2_participation": 20,
+        "badminton_mixed_semi_participation": 80,
+        "badminton_mixed_runners": 0,
+        "badminton_mixed_winners": 0
       }
     },
     { 
@@ -106,7 +143,25 @@ const detailedScores = {
         "cards_tower": 100,
         "cards_tower_submission": 5,
         "logo_submission": 20,
-        "logo_main": 100
+        "logo_main": 100,
+        // Badminton Men's Doubles
+        "badminton_mens_r1_participation": 10,
+        "badminton_mens_r2_participation": 60,
+        "badminton_mens_r3_participation": 30,
+        "badminton_mens_semi_participation": 0,
+        "badminton_mens_runners": 0,
+        "badminton_mens_winners": 100,
+        // Badminton Women's Doubles
+        "badminton_womens_r1_participation": 0,
+        "badminton_womens_semi_participation": 0,
+        "badminton_womens_runners": 70,
+        "badminton_womens_winners": 0,
+        // Badminton Mixed Doubles
+        "badminton_mixed_r1_participation": 0,
+        "badminton_mixed_r2_participation": 40,
+        "badminton_mixed_semi_participation": 0,
+        "badminton_mixed_runners": 70,
+        "badminton_mixed_winners": 0
       }
     },
     { 
@@ -139,7 +194,25 @@ const detailedScores = {
         "cards_tower": 50,
         "cards_tower_submission": 0,
         "logo_submission": 10,
-        "logo_main": 50
+        "logo_main": 50,
+        // Badminton Men's Doubles
+        "badminton_mens_r1_participation": 40,
+        "badminton_mens_r2_participation": 40,
+        "badminton_mens_r3_participation": 60,
+        "badminton_mens_semi_participation": 40,
+        "badminton_mens_runners": 0,
+        "badminton_mens_winners": 0,
+        // Badminton Women's Doubles
+        "badminton_womens_r1_participation": 40,
+        "badminton_womens_semi_participation": 40,
+        "badminton_womens_runners": 0,
+        "badminton_womens_winners": 0,
+        // Badminton Mixed Doubles
+        "badminton_mixed_r1_participation": 40,
+        "badminton_mixed_r2_participation": 20,
+        "badminton_mixed_semi_participation": 0,
+        "badminton_mixed_runners": 0,
+        "badminton_mixed_winners": 100
       }
     },
   ]
@@ -164,6 +237,7 @@ const DetailedScores = ({ showButton = true, initiallyOpen = false, containerSx 
     'game4': detailedScores.categories.filter(cat => cat.id.includes('chess_')),
     'game5': detailedScores.categories.filter(cat => cat.id.includes('cards_tower')),
     'game6': detailedScores.categories.filter(cat => cat.id.includes('logo_')),
+    'game7': detailedScores.categories.filter(cat => cat.id.includes('badminton_')),
   };
   
   const gameLabels = {
@@ -175,6 +249,7 @@ const DetailedScores = ({ showButton = true, initiallyOpen = false, containerSx 
     'game4': 'Chess',
     'game5': 'Cards Tower',
     'game6': 'Build Your Logo',
+    'game7': 'Badminton',
   };
   
   return (
@@ -215,7 +290,7 @@ const DetailedScores = ({ showButton = true, initiallyOpen = false, containerSx 
             <span style={{ backgroundColor: '#4CAF50', color: 'white', padding: '3px 8px', borderRadius: '4px', marginRight: '8px' }}>
               Updated
             </span>
-            May 04, 2025
+            May 16, 2025
           </Typography>
           
           <Box sx={{ 

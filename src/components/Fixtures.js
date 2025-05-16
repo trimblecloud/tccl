@@ -164,21 +164,21 @@ const Fixtures = () => {
       fixtures: [
         {
           title: 'Men\'s Doubles Tournament',
-          url: 'https://challonge.com/tcclmensbadminton/module',
+          url: 'https://challonge.com/tcclmensbadminton/module?theme=4779',
           notes: [
             'This bracket shows the Men\'s Doubles tournament matches and results.'
           ]
         },
         {
           title: 'Women\'s Doubles Tournament',
-          url: 'https://challonge.com/tcclwomensbadminton/module',
+          url: 'https://challonge.com/tcclwomensbadminton/module?theme=4779',
           notes: [
             'This bracket shows the Women\'s Doubles tournament matches and results.'
           ]
         },
         {
           title: 'Mixed Doubles Tournament',
-          url: 'https://challonge.com/tcclmixedbadminton/module',
+          url: 'https://challonge.com/tcclmixedbadminton/module?theme=4779',
           notes: [
             'This bracket shows the Mixed Doubles tournament matches and results.'
           ]

@@ -183,9 +183,9 @@ const Events = () => {
     },
     { 
       name: 'Tug of war',
-      startDate: '5/21/2025',
-      endDate: '5/21/2025',
-      dayInfo: 'Wednesday',
+      startDate: '5/22/2025',
+      endDate: '5/22/2025',
+      dayInfo: 'Thursday',
       time: '4:00 - 5:00 PM',
       details: 'Show your team strength in this classic tug of war competition.',
       categories: ['Team', 'Outdoor']
@@ -204,17 +204,17 @@ const Events = () => {
       startDate: '5/23/2025',
       endDate: '5/23/2025',
       dayInfo: 'Friday',
-      time: '6:00 - 11:00 AM',
-      details: 'Morning cricket tournament between house teams.',
+      time: '4:00 - 7:00 PM',
+      details: 'Futsal Ground Opposite to the office - Near Decathlon',
       categories: ['Outdoor', 'Sports']
     },
     { 
       name: 'Football',
-      startDate: '5/17/2025',
-      endDate: '5/17/2025',
-      dayInfo: 'Saturday',
-      time: '7:00 - 11:00 AM',
-      details: 'Morning football tournament between house teams.',
+      startDate: '5/21/2025',
+      endDate: '5/21/2025',
+      dayInfo: 'Wednesday',
+      time: '4:00 - 07:00 PM',
+      details: 'Futsal Ground Opposite to the office - Near Decathlon',
       categories: ['Outdoor', 'Sports']
     }
   ];

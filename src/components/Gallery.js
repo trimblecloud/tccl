@@ -29,7 +29,8 @@ import {
   CollectionsRounded,
   Casino as ChessIcon,
   Architecture as CardsTowerIcon,
-  Brush as BrushIcon
+  Brush as BrushIcon,
+  SportsTennis as SportsTennisIcon
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import yellowSparksLogo from './logo/yellow-sparks-logo.png';
@@ -74,6 +75,18 @@ const importAll = (r) => r.keys().map(r);
 
 // Events data structure - extensible for adding more events
 const events = [
+  {
+    id: 'badminton',
+    name: 'Badminton',
+    description: 'Exciting badminton matches featuring men\'s, women\'s, and mixed doubles categories',
+    icon: <SportsTennisIcon />,
+    images: importAll(require.context('./gallery/badminton', false, /\.(png|jpe?g|JPG|svg)$/)),
+    date: 'May 15-16, 2025',
+    badge: {
+      count: 0, // Will be set dynamically
+      color: 'warning'
+    }
+  },
   {
     id: 'buildyourlogo',
     name: 'Build Your Logo',

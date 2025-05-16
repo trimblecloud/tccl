@@ -45,6 +45,12 @@ import karthikKPhoto from './images/participants/participant_karthik_k.jpg';
 import josephDanielPhoto from './images/participants/participant_joseph_daniel_raj_ignaci.jpg';
 import ranjithbabuDarumanPhoto from './images/participants/participant_ranjithbabu_daruman.jpg';
 
+// Import participant photos - Badminton
+import balajiLakshmananPhoto from './images/participants/participant_balaji_lakshmanan.jpg';
+import sweathaSPhoto from './images/participants/participant_sweatha_s.jpg';
+import raahaviMPhoto from './images/participants/participant_raahavi_m.jpg';
+import ragupathiVeluduraiPhoto from './images/participants/participant_ragupathi_veludurai.jpg';
+
 // Import participant photos - Card Tower
 import infantShinyPhoto from './images/participants/participant_infant_shiny_a.jpg';
 import keerthanaDhandapaniPhoto from './images/participants/participant_keerthana_dhandapani.jpg';
@@ -143,6 +149,69 @@ const Winners = () => {
     }
   };  // Winners data for each event
   const eventsData = [
+    {
+      id: 'badminton-men',
+      name: 'Badminton Men\'s Doubles',
+      icon: <SportsTennisIcon />,
+      colors: ['#3F51B5', '#303F9F'],
+      description: 'Men\'s doubles tournament with knockout format',
+      winners: {
+        house: 'house2',
+        members: [
+          { name: 'Balaji Lakshmanan', photo: balajiLakshmananPhoto },
+          { name: 'Ravi Thangadurai', photo: raviThangaduraiPhoto }
+        ]
+      },
+      runners: {
+        house: 'house1',
+        members: [
+          { name: 'Karthik K', photo: karthikKPhoto },
+          { name: 'Madhan Babu S', photo: madhanBabuSPhoto }
+        ]
+      }
+    },
+    {
+      id: 'badminton-women',
+      name: 'Badminton Women\'s Doubles',
+      icon: <SportsTennisIcon />,
+      colors: ['#009688', '#00796B'],
+      description: 'Women\'s doubles tournament with knockout format',
+      winners: {
+        house: 'house1',
+        members: [
+          { name: 'Sweatha S', photo: sweathaSPhoto },
+          { name: 'Hema Priya Dharshini V', photo: hemaDharshiniPhoto }
+        ]
+      },
+      runners: {
+        house: 'house2',
+        members: [
+          { name: 'Infant Shiny A', photo: infantShinyPhoto },
+          { name: 'Vinoci K L', photo: vinociKLPhoto }
+        ]
+      }
+    },
+    {
+      id: 'badminton-mixed',
+      name: 'Badminton Mixed Doubles',
+      icon: <SportsTennisIcon />,
+      colors: ['#673AB7', '#512DA8'],
+      description: 'Mixed doubles tournament with knockout format',
+      winners: {
+        house: 'house3',
+        members: [
+          { name: 'Ragupathi Veludurai', photo: ragupathiVeluduraiPhoto },
+          { name: 'Raahavi M', photo: raahaviMPhoto }
+        ]
+      },
+      runners: {
+        house: 'house2',
+        members: [
+          { name: 'Balaji Lakshmanan', photo: balajiLakshmananPhoto },
+          { name: 'Infant Shiny A', photo: infantShinyPhoto }
+        ]
+      }
+    },
     {
       id: 'build-your-logo',
       name: 'Build Your Logo',

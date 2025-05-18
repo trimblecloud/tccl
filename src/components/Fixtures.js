@@ -276,10 +276,10 @@ const Fixtures = () => {
       icon: <SportsCricketIcon />,
       color: '#673AB7', // Purple
       categories: ['Outdoor', 'Sports', 'Team'],
-      description: 'Morning cricket tournament between house teams.',
+      description: 'Cricket tournament between house teams.',
       venue: 'TBD Cricket Ground',
       timings: [
-        { date: '10th May 2025 (Saturday)', details: 'All matches from 6:00 AM to 11:00 AM' },
+        { date: '23rd May 2025 (Friday)', details: 'All matches from 4:00 PM to 7:00 PM' },
       ],
       fixtures: [
         {

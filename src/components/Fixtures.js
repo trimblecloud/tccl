@@ -277,9 +277,9 @@ const Fixtures = () => {
       color: '#673AB7', // Purple
       categories: ['Outdoor', 'Sports', 'Team'],
       description: 'Cricket tournament between house teams.',
-      venue: 'TBD Cricket Ground',
+      venue: 'Kovilambaakam Whitefield Cricket Ground',
       timings: [
-        { date: '23rd May 2025 (Friday)', details: 'All matches from 4:00 PM to 7:00 PM' },
+        { date: '13th June 2025 (Friday)', details: 'All matches from 3:00 PM to 9:30 PM' },
       ],
       fixtures: [
         {

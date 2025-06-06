@@ -10,6 +10,8 @@ import SportsCricketIcon from '@mui/icons-material/SportsCricket';
 import CasinoIcon from '@mui/icons-material/Casino';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import PsychologyIcon from '@mui/icons-material/Psychology';
+import SportsFootballIcon from '@mui/icons-material/SportsFootball';
+import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 
 // Import house logos
 import yellowSparksLogo from './logo/yellow-sparks-logo.png';
@@ -29,6 +31,21 @@ import jayanthBalakrishnanPhoto from './images/participants/participant_jayanth_
 import priyaRousiniPhoto from './images/participants/participant_priya_rousini_duraiazhagan.jpg';
 import kamalakkannanRPhoto from './images/participants/participant_kamalakkannan_r.jpg';
 import rajkumarSPhoto from './images/participants/participant_rajkumar_s.jpg';
+
+// Import additional participants for Football and Tug of War
+import shankarChandranPhoto from './images/participants/participant_shankar_chandran.jpg';
+import sasidharanRajaganapathiPhoto from './images/participants/participant_sasidharan_rajaganapathi.jpg';
+import dharmarajanRajendranPhoto from './images/participants/participant_dharmarajan_rajendran.jpg';
+import yogiSPhoto from './images/participants/participant_yogi_s.jpg';
+import ajeysuriyaKanakarhajPhoto from './images/participants/participant_ajeysurya_kanakarhaj.jpg';
+import sakthiganeshRPhoto from './images/participants/participant_sakthiganesh_r.jpg';
+import bharathBabuRPhoto from './images/participants/participant_bharath_babu_r.jpg';
+import ragulKarthickPhoto from './images/participants/participant_ragul_karthick.jpg';
+import dhivyadharshiniTPhoto from './images/participants/participant_dhivyadharshini_t.jpg';
+import kedharMummadisetttiPhoto from './images/participants/participant_kedhar_mummadisetti.jpg';
+import vineshParamasivamPhoto from './images/participants/participant_vinesh_paramasivam.jpg';
+import ajayRajanRPhoto from './images/participants/participant_ajay_rajan_r.jpg';
+import prabuMonkayarkarasiAyyappanPhoto from './images/participants/participant_prabu_monkayarkarasi_ayyappan.jpg';
 
 // Import participant photos - Table Tennis Doubles
 import sathishkumarSPhoto from './images/participants/participant_sathishkumar_sampathkumar.jpg';
@@ -67,7 +84,6 @@ import vinociKLPhoto from './images/participants/participant_vinoci_k_l.jpg';
 import sudeepMPhoto from './images/participants/participant_sudeep_m.jpg';
 import dhineshkumarDPhoto from './images/participants/participant_dhineshkumar_d.jpg';
 import sumithraKamalakkannanPhoto from './images/participants/participant_sumithra_kamalakkannan.jpg';
-import dhivyadharshiniTPhoto from './images/participants/participant_dhivyadharshini_t.jpg';
 import abdulKhaliqPhoto from './images/participants/participant_abdul_khaliq_mohamed_sherfudeen.jpg';
 import vinethPPhoto from './images/participants/participant_vineth_p.jpg';
 
@@ -149,6 +165,73 @@ const Winners = () => {
     }
   };  // Winners data for each event
   const eventsData = [
+    {
+      id: 'football',
+      name: 'Football',
+      icon: <SportsFootballIcon />,
+      colors: ['#4CAF50', '#388E3C'],
+      description: 'Team competition showcasing footballing skills and teamwork',
+      winners: {
+        house: 'house1',
+        members: [
+          { name: 'Aravinth Karthikeyan', photo: aravinthKarthikeyanPhoto },
+          { name: 'Madhan Babu S', photo: madhanBabuSPhoto },
+          { name: 'Karthik K', photo: karthikKPhoto },
+          { name: 'Shankar Chandran', photo: shankarChandranPhoto },
+          { name: 'Sasidharan Rajaganapathi', photo: sasidharanRajaganapathiPhoto },
+          { name: 'Senthil Kumar Palanivelu', photo: senthilKumarPhoto }
+        ]
+      },
+      runners: {
+        house: 'house2',
+        members: [
+          { name: 'RanjithBabu Daruman', photo: ranjithbabuDarumanPhoto },
+          { name: 'Paulson J', photo: paulsonJPhoto },
+          { name: 'Dharani Sanjai B', photo: dharaniSanjaiBPhoto },
+          { name: 'Sudeep M', photo: sudeepMPhoto },
+          { name: 'Ravi Thangadurai', photo: raviThangaduraiPhoto },
+          { name: 'Balaji Lakshmanan', photo: balajiLakshmananPhoto },
+          { name: 'Yogi S', photo: yogiSPhoto }
+        ]
+      }
+    },
+    {
+      id: 'tugofwar',
+      name: 'Tug Of War',
+      icon: <FitnessCenterIcon />,
+      colors: ['#9C27B0', '#7B1FA2'],
+      description: 'Team competition testing strength, strategy and coordination',
+      winners: {
+        house: 'house3',
+        members: [
+          { name: 'Ajeysurya Kanakarhaj', photo: ajeysuriyaKanakarhajPhoto },
+          { name: 'Sakthiganesh R', photo: sakthiganeshRPhoto },
+          { name: 'Bharath Babu R', photo: bharathBabuRPhoto },
+          { name: 'Pranesh K', photo: praneshKPhoto },
+          { name: 'Nikhilesh S P', photo: nikhileshSPPhoto },
+          { name: 'Ragupathi Veludurai', photo: ragupathiVeluduraiPhoto },
+          { name: 'Ragul Karthick', photo: ragulKarthickPhoto },
+          { name: 'Sumithra Kamalakannan', photo: sumithraKamalakkannanPhoto },
+          { name: 'Kamalakkannan R', photo: kamalakkannanRPhoto },
+          { name: 'Dhivyadharshini T', photo: dhivyadharshiniTPhoto }
+        ]
+      },
+      runners: {
+        house: 'house1',
+        members: [
+          { name: 'Kedhar Mummadisetti', photo: kedharMummadisetttiPhoto },
+          { name: 'Aravinth Karthikeyan', photo: aravinthKarthikeyanPhoto },
+          { name: 'Karthik K', photo: karthikKPhoto },
+          { name: 'Vinesh Paramasivam', photo: vineshParamasivamPhoto },
+          { name: 'Ajay Rajan R', photo: ajayRajanRPhoto },
+          { name: 'Vikash S R', photo: vikashSRPhoto },
+          { name: 'Prabu Monkayarkarasi Ayyappan', photo: prabuMonkayarkarasiAyyappanPhoto },
+          { name: 'Sasidharan Rajaganapathi', photo: sasidharanRajaganapathiPhoto },
+          { name: 'Beulah Mercy Paul Manickam', photo: beulahMercyPhoto },
+          { name: 'Dharmarajan Rajendran', photo: dharmarajanRajendranPhoto }
+        ]
+      }
+    },
     {
       id: 'badminton-men',
       name: 'Badminton Men\'s Doubles',

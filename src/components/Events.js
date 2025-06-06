@@ -183,9 +183,9 @@ const Events = () => {
     },
     { 
       name: 'Tug of war',
-      startDate: '5/22/2025',
-      endDate: '5/22/2025',
-      dayInfo: 'Thursday',
+      startDate: '5/27/2025',
+      endDate: '5/27/2025',
+      dayInfo: 'Tuessday',
       time: '4:00 - 5:00 PM',
       details: 'Show your team strength in this classic tug of war competition.',
       categories: ['Team', 'Outdoor']
@@ -201,19 +201,19 @@ const Events = () => {
     },
     { 
       name: 'Cricket',
-      startDate: '5/23/2025',
-      endDate: '5/23/2025',
+      startDate: '6/13/2025',
+      endDate: '6/13/2025',
       dayInfo: 'Friday',
-      time: '4:00 - 7:00 PM',
-      details: 'Futsal Ground Opposite to the office - Near Decathlon',
+      time: '3:00 - 10:00 PM',
+      details: 'Kovilambaakam Whitefield Cricket Ground',
       categories: ['Outdoor', 'Sports']
     },
     { 
       name: 'Football',
-      startDate: '5/21/2025',
-      endDate: '5/21/2025',
-      dayInfo: 'Wednesday',
-      time: '4:00 - 07:00 PM',
+      startDate: '5/24/2025',
+      endDate: '5/24/2025',
+      dayInfo: 'Saturday',
+      time: '4:00 - 08:00 PM',
       details: 'Futsal Ground Opposite to the office - Near Decathlon',
       categories: ['Outdoor', 'Sports']
     }

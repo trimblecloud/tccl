@@ -30,7 +30,9 @@ import {
   Casino as ChessIcon,
   Architecture as CardsTowerIcon,
   Brush as BrushIcon,
-  SportsTennis as SportsTennisIcon
+  SportsTennis as SportsTennisIcon,
+  SportsFootball as FootballIcon,
+  FitnessCenter as TugOfWarIcon
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import yellowSparksLogo from './logo/yellow-sparks-logo.png';
@@ -75,6 +77,30 @@ const importAll = (r) => r.keys().map(r);
 
 // Events data structure - extensible for adding more events
 const events = [
+{
+    id: 'tugofwar',
+    name: 'Tug Of War',
+    description: 'Intense tug of war competition testing strength and teamwork',
+    icon: <TugOfWarIcon />,
+    images: importAll(require.context('./gallery/tugofwar', false, /\.(png|jpe?g|JPG|svg)$/)),
+    date: '27 May, 2025',
+    badge: {
+      count: 0, // Will be set dynamically
+      color: 'warning'
+    }
+  },
+  {
+    id: 'football',
+    name: 'Football',
+    description: 'Thrilling football matches showcasing teamwork and competitive spirit',
+    icon: <FootballIcon />,
+    images: importAll(require.context('./gallery/football', false, /\.(png|jpe?g|JPG|svg)$/)),
+    date: 'May 24, 2025',
+    badge: {
+      count: 0, // Will be set dynamically
+      color: 'success'
+    }
+  },
   {
     id: 'badminton',
     name: 'Badminton',
@@ -133,8 +159,7 @@ const events = [
       count: 0, // Will be set dynamically
       color: 'success'
     }
-  },
-  {
+  },  {
     id: 'cardstower',
     name: 'Cards Tower',
     description: 'Creative card tower building competition testing patience and precision',

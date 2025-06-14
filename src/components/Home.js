@@ -89,9 +89,9 @@ const Home = () => {
         console.error("Error fetching leaderboard data: ", error);
         // Fallback to hardcoded values
         setLeaderBoard([
-          { house: 1, houseName: "The Yellow Sparks", points: 210, logo: yellowSparksLogo },
-          { house: 2, houseName: "Sparta", points: 60, logo: spartaLogo },
-          { house: 3, houseName: "Mission FunPossible", points: 150, logo: missionFunPossibleLogo },
+          { house: 1, houseName: "The Yellow Sparks", points: 1780, logo: yellowSparksLogo },
+          { house: 2, houseName: "Sparta", points: 1855, logo: spartaLogo },
+          { house: 3, houseName: "Mission FunPossible", points: 1320, logo: missionFunPossibleLogo },
         ]);
       } finally {
         setLoading(false);
@@ -370,7 +370,7 @@ const Home = () => {
                   fontSize: { xs: '1.2rem', sm: '1.5rem' }
                 }}
               >
-                Leaderboard
+                Hall of Fame
               </Typography>
             </Box>
             

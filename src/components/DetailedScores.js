@@ -56,13 +56,18 @@ const detailedScores = {
     // Badminton Mixed Doubles Categories
     { id: "badminton_mixed_r1_participation", name: "Game 7 - Badminton Mixed Doubles - Round 1 Participation" },
     { id: "badminton_mixed_r2_participation", name: "Game 7 - Badminton Mixed Doubles - Round 2 Participation" },
-    { id: "badminton_mixed_semi_participation", name: "Game 7 - Badminton Mixed Doubles - Semi Final Participation" },    { id: "badminton_mixed_runners", name: "Game 7 - Badminton Mixed Doubles - Runners" },
-    { id: "badminton_mixed_winners", name: "Game 7 - Badminton Mixed Doubles - Winners" },    // Football Categories
+    { id: "badminton_mixed_semi_participation", name: "Game 7 - Badminton Mixed Doubles - Semi Final Participation" },
+    { id: "badminton_mixed_runners", name: "Game 7 - Badminton Mixed Doubles - Runners" },
+    { id: "badminton_mixed_winners", name: "Game 7 - Badminton Mixed Doubles - Winners" },
+    // Football Categories
     { id: "football_runners", name: "Game 8 - Football - Runners" },
     { id: "football_winners", name: "Game 8 - Football - Winners" },
     // Tug of War Categories
     { id: "tug_of_war_participants", name: "Game 9 - Tug Of War Participants Submission" },
-    { id: "tug_of_war", name: "Game 9 - Tug Of War" }
+    { id: "tug_of_war", name: "Game 9 - Tug Of War" },
+    // Cricket Categories
+    { id: "cricket_runners", name: "Game 10 - Cricket - Runners" },
+    { id: "cricket_winners", name: "Game 10 - Cricket - Winners" }
   ],
   houses: [
     { 
@@ -108,16 +113,21 @@ const detailedScores = {
         "badminton_womens_semi_participation": 40,
         "badminton_womens_runners": 0,
         "badminton_womens_winners": 100,
-        // Badminton Mixed Doubles        "badminton_mixed_r1_participation": 30,
+        // Badminton Mixed Doubles
+        "badminton_mixed_r1_participation": 30,
         "badminton_mixed_r2_participation": 20,
         "badminton_mixed_semi_participation": 80,
         "badminton_mixed_runners": 0,
-        "badminton_mixed_winners": 0,        // Football
+        "badminton_mixed_winners": 0,
+        // Football
         "football_runners": 0,
         "football_winners": 200,
         // Tug of War
         "tug_of_war_participants": 10,
-        "tug_of_war": 50
+        "tug_of_war": 50,
+        // Cricket
+        "cricket_runners": 0,
+        "cricket_winners": 300
       }
     },
     { 
@@ -163,16 +173,21 @@ const detailedScores = {
         "badminton_womens_semi_participation": 0,
         "badminton_womens_runners": 70,
         "badminton_womens_winners": 0,
-        // Badminton Mixed Doubles        "badminton_mixed_r1_participation": 0,
+        // Badminton Mixed Doubles
+        "badminton_mixed_r1_participation": 0,
         "badminton_mixed_r2_participation": 40,
         "badminton_mixed_semi_participation": 0,
         "badminton_mixed_runners": 70,
-        "badminton_mixed_winners": 0,        // Football
+        "badminton_mixed_winners": 0,
+        // Football
         "football_runners": 100,
         "football_winners": 0,
         // Tug of War
         "tug_of_war_participants": 20,
-        "tug_of_war": 0
+        "tug_of_war": 0,
+        // Cricket
+        "cricket_runners": 150,
+        "cricket_winners": 0
       }
     },
     { 
@@ -218,16 +233,13 @@ const detailedScores = {
         "badminton_womens_semi_participation": 40,
         "badminton_womens_runners": 0,
         "badminton_womens_winners": 0,
-        // Badminton Mixed Doubles        "badminton_mixed_r1_participation": 40,
+        // Badminton Mixed Doubles
+        "badminton_mixed_r1_participation": 40,
         "badminton_mixed_r2_participation": 20,
         "badminton_mixed_semi_participation": 0,
         "badminton_mixed_runners": 0,
-        "badminton_mixed_winners": 100,        // Football
-        "football_runners": 0,
-        "football_winners": 0,
-        // Tug of War
-        "tug_of_war_participants": 0,
-        "tug_of_war": 100
+        "badminton_mixed_winners": 100,
+        "tug_of_war": 100,
       }
     },
   ]
@@ -235,16 +247,7 @@ const detailedScores = {
 
 // Calculate total points for each house
 detailedScores.houses.forEach(house => {
-  if (house.id === "yellow_sparks") {
-    house.totalPoints = 1480; // Fixed total for Yellow Sparks as per requirement
-  } else if (house.id === "sparta") {
-    house.totalPoints = 1705; // Fixed total for Sparta as per requirement
-  } else if (house.id === "mission_funpossible") {
-    house.totalPoints = 1320; // Fixed total for Mission FunPossible as per requirement
-  } else {
-    // Fallback calculation if new houses are added in the future
-    house.totalPoints = Object.values(house.points).reduce((sum, points) => sum + points, 0);
-  }
+  house.totalPoints = Object.values(house.points).reduce((sum, points) => sum + points, 0);
 });
 
 const DetailedScores = ({ showButton = true, initiallyOpen = false, containerSx = {} }) => {
@@ -261,8 +264,10 @@ const DetailedScores = ({ showButton = true, initiallyOpen = false, containerSx 
     'game4': detailedScores.categories.filter(cat => cat.id.includes('chess_')),
     'game5': detailedScores.categories.filter(cat => cat.id.includes('cards_tower')),
     'game6': detailedScores.categories.filter(cat => cat.id.includes('logo_')),
-    'game7': detailedScores.categories.filter(cat => cat.id.includes('badminton_')),    'game8': detailedScores.categories.filter(cat => cat.id.includes('football_')),
-    'game9': detailedScores.categories.filter(cat => cat.id.includes('tug_of_war'))
+    'game7': detailedScores.categories.filter(cat => cat.id.includes('badminton_')),
+    'game8': detailedScores.categories.filter(cat => cat.id.includes('football_')),
+    'game9': detailedScores.categories.filter(cat => cat.id.includes('tug_of_war')),
+    'game10': detailedScores.categories.filter(cat => cat.id.includes('cricket_')),
   };
   
   const gameLabels = {
@@ -277,6 +282,7 @@ const DetailedScores = ({ showButton = true, initiallyOpen = false, containerSx 
     'game7': 'Badminton',
     'game8': 'Football',
     'game9': 'Tug Of War',
+    'game10': 'Cricket',
   };
   
   return (
@@ -313,10 +319,11 @@ const DetailedScores = ({ showButton = true, initiallyOpen = false, containerSx 
           flexDirection: {xs: 'column', sm: 'row'},
           gap: 2
         }}>
-          <Typography variant="body1" gutterBottom sx={{ mb: {xs: 0, sm: 0}, fontWeight: 'medium' }}>            <span style={{ backgroundColor: '#4CAF50', color: 'white', padding: '3px 8px', borderRadius: '4px', marginRight: '8px' }}>
+          <Typography variant="body1" gutterBottom sx={{ mb: {xs: 0, sm: 0}, fontWeight: 'medium' }}>
+            <span style={{ backgroundColor: '#4CAF50', color: 'white', padding: '3px 8px', borderRadius: '4px', marginRight: '8px' }}>
               Updated
             </span>
-            June 6, 2025
+            June 14, 2025
           </Typography>
           
           <Box sx={{ 
@@ -578,11 +585,12 @@ const DetailedScores = ({ showButton = true, initiallyOpen = false, containerSx 
                 >
                   TOTAL
                 </TableCell>
-                {detailedScores.houses.map((house) => {                  // Calculate subtotal based on active tab
+                {detailedScores.houses.map((house) => {
+                  // Calculate subtotal based on active tab
                   let subtotal;
                   if (activeTab === 'all') {
-                    // Use the fixed total points for the all tab
-                    subtotal = house.totalPoints;
+                    // For total of all categories, sum up all points
+                    subtotal = Object.values(house.points).reduce((sum, points) => sum + points, 0);
                   } else {
                     const relevantCategories = gameCategories[activeTab];
                     subtotal = relevantCategories.reduce((sum, category) => 

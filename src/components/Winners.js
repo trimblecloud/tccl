@@ -87,6 +87,13 @@ import sumithraKamalakkannanPhoto from './images/participants/participant_sumith
 import abdulKhaliqPhoto from './images/participants/participant_abdul_khaliq_mohamed_sherfudeen.jpg';
 import vinethPPhoto from './images/participants/participant_vineth_p.jpg';
 
+// Import additional participant photos for Cricket
+import ashokkumarSubburajPhoto from './images/participants/participant_ashokkumar_subburaj.jpg';
+import dharanidharanRPhoto from './images/participants/participant_dharanidharan_r.jpg';
+import balajiBavaSrikumarPhoto from './images/participants/participant_balaji_bava_srikumar.jpg';
+import srinathRaghavendranPhoto from './images/participants/participant_srinath_raghavendran.jpg';
+import venkatPrasadhPhoto from './images/participants/participant_venkat_prasadh.jpg';
+
 // Styled components
 const EventCard = styled(Card)(({ theme, color }) => ({
   marginBottom: '24px',
@@ -165,6 +172,48 @@ const Winners = () => {
     }
   };  // Winners data for each event
   const eventsData = [
+    {
+      id: 'cricket',
+      name: 'Cricket',
+      icon: <SportsCricketIcon />,
+      colors: ['#4CAF50', '#388E3C'],
+      description: 'Cricket tournament in league format',
+      winners: {
+        house: 'house1',
+        members: [
+          { name: 'Sweatha S', photo: sweathaSPhoto },
+          { name: 'Beulah Mercy Paul Manickam', photo: beulahMercyPhoto },
+          { name: 'Aravinth Karthikeyan', photo: aravinthKarthikeyanPhoto },
+          { name: 'Kedhar Mummadisetti', photo: kedharMummadisetttiPhoto },
+          { name: 'Senthil Kumar Palanivelu', photo: senthilKumarPhoto },
+          { name: 'Dharmarajan Rajendran', photo: dharmarajanRajendranPhoto },
+          { name: 'Dharanidharan R', photo: dharanidharanRPhoto },
+          { name: 'Vinesh Paramasivam', photo: vineshParamasivamPhoto },
+          { name: 'Karthik K', photo: karthikKPhoto },
+          { name: 'Madhan Babu S', photo: madhanBabuSPhoto },
+          { name: 'Balaji Bava Srikumar', photo: balajiBavaSrikumarPhoto },
+          { name: 'Sasidharan Rajaganapathi', photo: sasidharanRajaganapathiPhoto },
+          { name: 'Ashokkumar Subburaj', photo: ashokkumarSubburajPhoto },
+          { name: 'Shankar Chandran', photo: shankarChandranPhoto }
+        ]
+      },
+      runners: {
+        house: 'house2',
+        members: [
+          { name: 'Harivarthini R', photo: harivarthiniRPhoto },
+          { name: 'Vinoci K L', photo: vinociKLPhoto },
+          { name: 'Ravi Thangadurai', photo: raviThangaduraiPhoto },
+          { name: 'RanjithBabu Daruman', photo: ranjithbabuDarumanPhoto },
+          { name: 'Paulson J', photo: paulsonJPhoto },
+          { name: 'Dharani Sanjai B', photo: dharaniSanjaiBPhoto },
+          { name: 'Sudeep M', photo: sudeepMPhoto },
+          { name: 'Srinath Raghavendran', photo: srinathRaghavendranPhoto },
+          { name: 'Balaji Lakshmanan', photo: balajiLakshmananPhoto },
+          { name: 'Yogi S', photo: yogiSPhoto },
+          { name: 'Venkat Prasadh', photo: venkatPrasadhPhoto }
+        ]
+      }
+    },
     {
       id: 'football',
       name: 'Football',
@@ -441,7 +490,7 @@ const Winners = () => {
           { name: 'Karthik K', photo: karthikKPhoto }
         ]
       }
-    }
+    } 
   ];
 
   // Filtered events based on tab selection

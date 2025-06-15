@@ -30,6 +30,27 @@ This web application serves as the official website for the Trimble Cloud Champi
    npm start
    ```
 
+### Running Tests
+
+1. Setup Playwright (first time only):
+   ```bash
+   # On Windows
+   .\setup-playwright.ps1
+   
+   # On Linux/Mac
+   ./setup-playwright.sh
+   ```
+
+2. Run end-to-end navigation tests:
+   ```bash
+   npm run test:e2e
+   ```
+
+3. View test reports:
+   ```bash
+   npx playwright show-report
+   ```
+
 3. Open [http://localhost:3000](http://localhost:3000) in your browser to view the application.
 
 ## Development Workflow
